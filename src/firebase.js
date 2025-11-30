@@ -16,11 +16,5 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Enable debug mode in development
-if (import.meta.env.DEV) {
-    // @ts-ignore
-    app.firestore().settings({ experimentalForceLongPolling: true });
-}
-
 export const auth = getAuth(app);
 export const db = getFirestore(app);
