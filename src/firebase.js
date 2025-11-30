@@ -13,7 +13,14 @@ const firebaseConfig = {
     measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-PX2RFP4WGZ"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// Enable debug mode in development
+if (import.meta.env.DEV) {
+    // @ts-ignore
+    app.firestore().settings({ experimentalForceLongPolling: true });
+}
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
