@@ -1,19 +1,54 @@
 import { useMemo } from 'react';
-import { investmentCategories } from '../constants';
+import { getInvestmentCategoriesForLanguage } from '../constants';
+import { useLanguage } from './useLanguage';
 
 export const useFireStats = (data, config) => {
+    const { language } = useLanguage();
+    const investmentCategories = getInvestmentCategoriesForLanguage(language);
     const stats = useMemo(() => {
         if (data.length === 0) return null;
         const current = data[data.length - 1];
+        const currentYear = new Date().getFullYear();
+        const previousYear = currentYear - 1;
 
         // Net Worth
-        const totalAssets = Object.values(current.assets || {}).reduce((a, b) => a + Number(b), 0);
-        const totalLiabilities = Object.values(current.liabilities || {}).reduce((a, b) => a + Number(b), 0);
-        
-        // Colaboración en deudas (suma de lo que has pagado en deudas)
-        const debtCollaborationTotal = Object.values(current.debtCollaboration || {}).reduce((a, b) => a + Number(b), 0);
-        
-        // Sumar la colaboración en deudas al patrimonio total
+        const sumValues = (obj = {}) => Object.values(obj).reduce((a, b) => a + Number(b || 0), 0);
+        const calcMonthTotals = (month) => {
+            if (!month) {
+                return {
+                    assets: 0,
+                    liabilities: 0,
+                    debtCollaboration: 0,
+                    netWorth: 0,
+                    savings: 0,
+                    savingsRate: 0,
+                };
+            }
+
+            const assets = sumValues(month.assets);
+            const liabilities = sumValues(month.liabilities);
+            const debtCollaboration = sumValues(month.debtCollaboration);
+
+            const grossIncome = sumValues(month.income);
+            const taxes = sumValues(month.taxes);
+            const expenses = sumValues(month.expenses);
+            const netIncome = grossIncome - taxes;
+            const savings = netIncome - expenses;
+            const savingsRate = netIncome > 0 ? (savings / netIncome) * 100 : 0;
+
+            return {
+                assets,
+                liabilities,
+                debtCollaboration,
+                netWorth: assets + debtCollaboration - liabilities,
+                savings,
+                savingsRate,
+            };
+        };
+
+        const totalAssets = sumValues(current.assets);
+        const totalLiabilities = sumValues(current.liabilities);
+        const debtCollaborationTotal = sumValues(current.debtCollaboration);
         const netWorth = totalAssets + debtCollaborationTotal - totalLiabilities;
 
         // Activos considerados como objetivos de inversión (filtrar por categorías)
@@ -45,13 +80,36 @@ export const useFireStats = (data, config) => {
         const progress = targetInvestment > 0 ? (investmentAssetsTotal / targetInvestment) * 100 : 0;
 
         // Calcular patrimonio necesario hoy para alcanzar el objetivo (Coast FI)
-        const currentYear = new Date().getFullYear();
         const targetYear = config.targetYear || currentYear + 10;
         const yearsRemaining = Math.max(0, targetYear - currentYear);
         const expectedReturn = (config.expectedReturn || 7.0) / 100;
         const coastFiNumber = yearsRemaining > 0 && expectedReturn > 0
             ? targetInvestment / Math.pow(1 + expectedReturn, yearsRemaining)
             : targetInvestment;
+
+        const firstMonthOfYear = data.find(month => month.id.startsWith(`${currentYear}-`)) || data[0];
+        const previousYearMonths = data.filter(month => month.id.startsWith(`${previousYear}-`));
+
+        const currentTotals = calcMonthTotals(current);
+        const baselineTotals = calcMonthTotals(firstMonthOfYear);
+
+        const calcDelta = (currentValue, baseValue) => {
+            const difference = currentValue - baseValue;
+            const percent = baseValue !== 0 ? (difference / baseValue) * 100 : null;
+            return { difference, percent };
+        };
+
+        const netWorthDelta = calcDelta(currentTotals.netWorth, baselineTotals.netWorth);
+        const assetsDelta = calcDelta(currentTotals.assets, baselineTotals.assets);
+        const liabilitiesDelta = calcDelta(currentTotals.liabilities, baselineTotals.liabilities);
+        const savingsDelta = calcDelta(currentTotals.savings, baselineTotals.savings);
+        const savingsRateDelta = calcDelta(currentTotals.savingsRate, baselineTotals.savingsRate);
+
+        const previousYearAvgMonthlySpend = previousYearMonths.length > 0
+            ? previousYearMonths.reduce((acc, month) => acc + sumValues(month.expenses), 0) / previousYearMonths.length
+            : null;
+        const previousYearlySpend = previousYearAvgMonthlySpend != null ? previousYearAvgMonthlySpend * 12 : null;
+        const yearlySpendDelta = previousYearlySpend != null ? calcDelta(yearlySpend, previousYearlySpend) : null;
 
         return {
             netWorth,
@@ -63,9 +121,18 @@ export const useFireStats = (data, config) => {
             fiNumber: targetInvestment, // Mantener compatibilidad con código existente (ahora inversión)
             coastFiNumber,
             progress,
-            savings
+            savings,
+            yearComparisons: {
+                baselineLabel: firstMonthOfYear?.monthLabel,
+                netWorth: netWorthDelta,
+                assets: assetsDelta,
+                liabilities: liabilitiesDelta,
+                savings: savingsDelta,
+                savingsRate: savingsRateDelta,
+                yearlySpend: yearlySpendDelta
+            }
         };
-    }, [data, config]);
+    }, [data, config, language]);
 
     return stats;
 };

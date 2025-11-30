@@ -8,11 +8,13 @@ export const useLanguage = () => {
     // Initialize language from localStorage
     useEffect(() => {
         const savedLanguage = localStorage.getItem('fireApp_language');
+        
         if (savedLanguage && (savedLanguage === 'es' || savedLanguage === 'en')) {
             setLanguage(savedLanguage);
         } else {
             // Try to detect browser language
             const browserLanguage = navigator.language.split('-')[0];
+            
             if (browserLanguage === 'es') {
                 setLanguage('es');
             } else {

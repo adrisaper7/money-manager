@@ -3,20 +3,28 @@ export const formatCurrency = (value, language = 'es', exchangeRates = null) => 
         es: 'es-ES',
         en: 'en-US'
     };
-    
-    const currencies = {
-        es: 'EUR',
-        en: 'USD'
-    };
 
-    // Convertir moneda si se proporcionan tasas de cambio
-    let displayValue = value;
-    const targetCurrency = currencies[language] || 'EUR';
-    
-    if (exchangeRates && language === 'en') {
-        // Convertir de EUR a USD
-        displayValue = (value / (exchangeRates.EUR || 1)) * (exchangeRates.USD || 1.1);
+    // Moneda por defecto según idioma (para compatibilidad hacia atrás)
+    let targetCurrency = language === 'en' ? 'USD' : 'EUR';
+
+    // Si el usuario ha elegido una moneda en la configuración, usarla
+    try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+            const savedCurrency = localStorage.getItem('fireApp_currency');
+            if (savedCurrency === 'EUR' || savedCurrency === 'USD') {
+                targetCurrency = savedCurrency;
+            }
+        }
+    } catch (e) {
+        // Ignorar errores de acceso a localStorage (modo incógnito, etc.)
     }
+
+    // No convertir el valor numérico, solo cambiar el símbolo de la moneda
+    let displayValue = value;
+    // La conversión de moneda ha sido deshabilitada intencionalmente
+    // if (exchangeRates && targetCurrency === 'USD') {
+    //     displayValue = (value / (exchangeRates.EUR || 1)) * (exchangeRates.USD || 1.1);
+    // }
 
     return new Intl.NumberFormat(locales[language] || 'es-ES', {
         style: 'currency',
@@ -40,6 +48,96 @@ export const formatPercent = (value, language = 'es') => {
 };
 
 export const generateMonthId = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+export const calculateAverageMonthlyInvestment = (data = [], monthsWindow = 60) => {
+    if (!Array.isArray(data) || data.length === 0) return 0;
+
+    const monthsToAvg = Math.min(data.length, monthsWindow);
+    if (monthsToAvg === 0) return 0;
+
+    const recentData = data.slice(-monthsToAvg);
+
+    const totalSavings = recentData.reduce((acc, month) => {
+        const grossIncome = Object.values(month?.income || {}).reduce((a, b) => a + Number(b || 0), 0);
+        const taxes = Object.values(month?.taxes || {}).reduce((a, b) => a + Number(b || 0), 0);
+        const expenses = Object.values(month?.expenses || {}).reduce((a, b) => a + Number(b || 0), 0);
+        const netIncome = grossIncome - taxes;
+        const monthlySavings = netIncome - expenses;
+        return acc + monthlySavings;
+    }, 0);
+
+    return totalSavings / monthsToAvg;
+};
+
+export const calculateAverageNetIncome = (data = [], monthsWindow = 60) => {
+    if (!Array.isArray(data) || data.length === 0) return { averageNetIncome: 0, monthsUsed: 0 };
+
+    const monthsToAvg = Math.min(data.length, monthsWindow);
+    if (monthsToAvg === 0) return { averageNetIncome: 0, monthsUsed: 0 };
+
+    const recentData = data.slice(-monthsToAvg);
+
+    const totalNetIncome = recentData.reduce((acc, month) => {
+        const grossIncome = Object.values(month?.income || {}).reduce((a, b) => a + Number(b || 0), 0);
+        const taxes = Object.values(month?.taxes || {}).reduce((a, b) => a + Number(b || 0), 0);
+        const netIncome = grossIncome - taxes;
+        return acc + netIncome;
+    }, 0);
+
+    return { averageNetIncome: totalNetIncome / monthsToAvg, monthsUsed: monthsToAvg };
+};
+
+export const calculateMedianMonthlyInvestment = (data = [], monthsWindow = 60) => {
+    if (!Array.isArray(data) || data.length === 0) return 0;
+
+    const monthsToUse = Math.min(data.length, monthsWindow);
+    if (monthsToUse === 0) return 0;
+
+    const recentData = data.slice(-monthsToUse);
+
+    const savingsSeries = recentData.map(month => {
+        const grossIncome = Object.values(month?.income || {}).reduce((a, b) => a + Number(b || 0), 0);
+        const taxes = Object.values(month?.taxes || {}).reduce((a, b) => a + Number(b || 0), 0);
+        const expenses = Object.values(month?.expenses || {}).reduce((a, b) => a + Number(b || 0), 0);
+        const netIncome = grossIncome - taxes;
+        return netIncome - expenses;
+    }).sort((a, b) => a - b);
+
+    const mid = Math.floor(savingsSeries.length / 2);
+    if (savingsSeries.length % 2 === 0) {
+        return (savingsSeries[mid - 1] + savingsSeries[mid]) / 2;
+    }
+    return savingsSeries[mid];
+};
+
+export const calculatePercentageBasedInvestment = ({ data = [], investmentRate = 0, monthsWindow = 6 } = {}) => {
+    if (!Array.isArray(data) || data.length === 0) {
+        return { monthlyInvestment: 0, averageNetIncome: 0, monthsUsed: 0 };
+    }
+
+    const monthsUsed = Math.min(data.length, monthsWindow);
+    if (monthsUsed === 0) {
+        return { monthlyInvestment: 0, averageNetIncome: 0, monthsUsed: 0 };
+    }
+
+    const recentData = data.slice(-monthsUsed);
+    const totalNetIncome = recentData.reduce((acc, month) => {
+        const grossIncome = Object.values(month?.income || {}).reduce((a, b) => a + Number(b || 0), 0);
+        const taxes = Object.values(month?.taxes || {}).reduce((a, b) => a + Number(b || 0), 0);
+        return acc + (grossIncome - taxes);
+    }, 0);
+
+    const averageNetIncome = totalNetIncome / monthsUsed;
+    const monthlyInvestment = investmentRate > 0
+        ? Math.max(0, Math.round((averageNetIncome * investmentRate) / 100))
+        : 0;
+
+    return {
+        monthlyInvestment,
+        averageNetIncome,
+        monthsUsed,
+    };
+};
 
 export const downloadData = (data, filename = 'fire_dashboard_data_es.json') => {
     const jsonString = JSON.stringify(data);

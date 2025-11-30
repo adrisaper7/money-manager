@@ -6,7 +6,6 @@ export const NavigationTabs = ({ activeTab, setActiveTab, t }) => {
     { id: 'dashboard', label: t ? t('navigation.dashboard') : 'Dashboard', icon: Activity },
     { id: 'networth', label: t ? t('navigation.networth') : 'Net Worth', icon: Wallet },
     { id: 'budget', label: t ? t('navigation.budget') : 'Budget', icon: DollarSign },
-    { id: 'investment', label: t ? t('navigation.investments') : 'Investments', icon: TrendingUp },
     { id: 'settings', label: t ? t('navigation.settings') : 'Goals', icon: Settings },
   ];
 

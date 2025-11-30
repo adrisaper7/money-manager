@@ -7,14 +7,17 @@ export const LoginView = ({ currentUser, onLogin, onRegister, onLogout, t }) => 
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage('');
         setIsError(false);
+        if (isSubmitting) return;
+        setIsSubmitting(true);
 
         if (isRegistering) {
-            const result = onRegister(username, password);
+            const result = await onRegister(username, password);
             if (result.success) {
                 setIsError(false);
                 setMessage(t('auth.messages.registerSuccess'));
@@ -27,7 +30,7 @@ export const LoginView = ({ currentUser, onLogin, onRegister, onLogout, t }) => 
                 setMessage(result.message);
             }
         } else {
-            const result = onLogin(username, password);
+            const result = await onLogin(username, password);
             if (result.success) {
                 setIsError(false);
                 setMessage(result.message);
@@ -39,6 +42,7 @@ export const LoginView = ({ currentUser, onLogin, onRegister, onLogout, t }) => 
                 setMessage(result.message);
             }
         }
+        setIsSubmitting(false);
     };
 
     if (currentUser) {
@@ -101,9 +105,10 @@ export const LoginView = ({ currentUser, onLogin, onRegister, onLogout, t }) => 
 
                 <button
                     type="submit"
-                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-60"
+                    disabled={isSubmitting}
                 >
-                    {isRegistering ? t('auth.register') : t('auth.login')}
+                    {isSubmitting ? t('auth.loading') : (isRegistering ? t('auth.register') : t('auth.login'))}
                 </button>
 
                 <div className="relative">

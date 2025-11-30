@@ -9,15 +9,31 @@ const colorClasses = {
     blue: 'bg-blue-50 text-blue-600',
 };
 
-export const KPICard = ({ title, value, subtext, icon: Icon, color = "blue" }) => (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-start justify-between">
-        <div>
-            <p className="text-sm font-medium text-slate-500 mb-1">{title}</p>
-            <h3 className="text-2xl font-bold text-slate-800">{value}</h3>
-            {subtext && <p className="text-xs text-slate-400 mt-2">{subtext}</p>}
+const trendColors = {
+    positive: 'text-emerald-600 bg-emerald-50',
+    negative: 'text-rose-600 bg-rose-50'
+};
+
+export const KPICard = ({ title, value, subtext, icon: Icon, color = "blue", trend = null }) => (
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-4">
+        <div className="flex items-start justify-between gap-4">
+            <div>
+                <p className="text-sm font-medium text-slate-500 mb-1">{title}</p>
+                <h3 className="text-2xl font-bold text-slate-800">{value}</h3>
+                {subtext && <p className="text-xs text-slate-400 mt-2">{subtext}</p>}
+            </div>
+            <div className={`p-3 rounded-lg ${colorClasses[color] || colorClasses.blue}`}>
+                <Icon size={24} />
+            </div>
         </div>
-        <div className={`p-3 rounded-lg ${colorClasses[color] || colorClasses.blue}`}>
-            <Icon size={24} />
-        </div>
+        {trend && (
+            <div>
+                <div className={`inline-flex items-center gap-2 text-xs font-semibold px-3 py-1 rounded-full ${trend.positive ? trendColors.positive : trendColors.negative}`}>
+                    <span>{trend.text}</span>
+                    {trend.percentText && <span className="opacity-80">({trend.percentText})</span>}
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1">vs {trend.label || 'inicio de año'}</p>
+            </div>
+        )}
     </div>
 );

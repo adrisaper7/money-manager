@@ -84,6 +84,11 @@ export const translations = {
       download: 'Descargar',
       upload: 'Cargar',
       loading: 'Cargando...'
+    },
+    configuration: {
+      title: 'Configuración',
+      currency: 'Moneda',
+      language: 'Idioma'
     }
   },
   en: {
@@ -171,6 +176,11 @@ export const translations = {
       download: 'Download',
       upload: 'Upload',
       loading: 'Loading...'
+    },
+    configuration: {
+      title: 'Configuration',
+      currency: 'Currency',
+      language: 'Language'
     }
   }
 };

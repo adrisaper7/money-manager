@@ -12,8 +12,7 @@ export const SavingsRateChart = ({ data }) => {
 
         return {
             monthLabel: row.monthLabel,
-            savingsRate: rate,
-            goal: 30
+            savingsRate: rate
         };
     });
 
@@ -25,11 +24,17 @@ export const SavingsRateChart = ({ data }) => {
                     <ComposedChart data={chartData}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                         <XAxis dataKey="monthLabel" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} angle={-45} textAnchor="end" height={60} />
-                        <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}%`} domain={[0, 60]} />
+                        <YAxis
+                            stroke="#94a3b8"
+                            fontSize={12}
+                            tickLine={false}
+                            axisLine={false}
+                            domain={[0, 100]}
+                            tickFormatter={(val) => `${Math.round(val)}%`}
+                        />
                         <Tooltip formatter={(value) => `${value.toFixed(1)}%`} contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0' }} />
                         <Legend />
-                        <Line type="monotone" dataKey="goal" name="Meta" stroke="#94a3b8" strokeDasharray="5 5" strokeWidth={2} dot={false} />
-                        <Line type="monotone" dataKey="savingsRate" name="Tasa Ahorro" stroke="#10b981" strokeWidth={3} />
+                        <Line type="monotone" dataKey="savingsRate" name="Tasa Ahorro" stroke="#10b981" strokeWidth={3} dot={false} activeDot={false} />
                     </ComposedChart>
                 </ResponsiveContainer>
             </div>

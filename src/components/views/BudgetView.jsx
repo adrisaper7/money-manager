@@ -2,10 +2,12 @@ import React from 'react';
 import { MonthNavigationBar } from '../MonthNavigationBar';
 import { DataEntryTable } from '../DataEntryTable';
 import { MonthNavigationProvider } from '../../contexts/MonthNavigationContext';
-import { defaultCategories } from '../../constants';
+import { getCategoriesForLanguage } from '../../constants';
 import { formatPercent } from '../../utils';
 
 export const BudgetView = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth, updateData, t, language, exchangeRates }) => {
+    const categories = getCategoriesForLanguage(language);
+    
     return (
         <MonthNavigationProvider data={data}>
             <div className="space-y-6">
@@ -30,7 +32,7 @@ export const BudgetView = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth,
                     <DataEntryTable
                         title={t('budget.income')}
                         type="income"
-                        categories={defaultCategories.income}
+                        categories={categories.income}
                         updateData={updateData}
                         language={language}
                         exchangeRates={exchangeRates}
@@ -38,7 +40,7 @@ export const BudgetView = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth,
                     <DataEntryTable
                         title={t('budget.taxes')}
                         type="taxes"
-                        categories={defaultCategories.taxes}
+                        categories={categories.taxes}
                         updateData={updateData}
                         language={language}
                         exchangeRates={exchangeRates}
@@ -46,7 +48,7 @@ export const BudgetView = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth,
                     <DataEntryTable
                         title={t('budget.expenses')}
                         type="expenses"
-                        categories={defaultCategories.expenses}
+                        categories={categories.expenses}
                         updateData={updateData}
                         language={language}
                         exchangeRates={exchangeRates}

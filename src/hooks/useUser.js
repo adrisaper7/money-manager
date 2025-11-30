@@ -1,95 +1,96 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged,
+    updateProfile
+} from 'firebase/auth';
+import { auth } from '../firebase';
+import { useLanguage } from './useLanguage';
+
+const formatUsernameEmail = (username = '') => {
+    const normalized = username.trim().toLowerCase();
+    if (!normalized) return '';
+    return `${normalized}@fireapp.local`;
+};
+
+const getFriendlyMessage = (code, fallbackMessage, t) => {
+    const messages = {
+        'auth/email-already-in-use': t('auth.messages.userAlreadyExists'),
+        'auth/weak-password': t('auth.messages.passwordMinLength'),
+        'auth/user-not-found': t('auth.messages.userNotFound'),
+        'auth/wrong-password': t('auth.messages.incorrectPassword'),
+        'auth/too-many-requests': 'Demasiados intentos. Intenta más tarde',
+        'auth/invalid-email': 'El formato del correo es inválido',
+        'auth/network-request-failed': 'No se pudo contactar con el servidor. Revisa tu conexión.',
+        'auth/internal-error': 'El servidor tuvo un problema. Intenta nuevamente en unos segundos.'
+    };
+    return messages[code] || fallbackMessage || t('auth.messages.loginSuccess');
+};
 
 export const useUser = () => {
     const [currentUser, setCurrentUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const { t } = useLanguage();
 
-    // Initialize user from localStorage
     useEffect(() => {
-        const savedUser = localStorage.getItem('fireApp_currentUser');
-        if (savedUser) {
-            setCurrentUser(JSON.parse(savedUser));
-        }
-        setIsLoading(false);
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setCurrentUser({
+                    id: user.uid,
+                    name: user.displayName || user.email?.split('@')[0] || 'Usuario'
+                });
+            } else {
+                setCurrentUser(null);
+            }
+            setIsLoading(false);
+        });
+
+        return () => unsubscribe();
     }, []);
 
-    // Get all registered users
-    const getAllUsers = () => {
-        const usersJson = localStorage.getItem('fireApp_users');
-        return usersJson ? JSON.parse(usersJson) : {};
-    };
-
-    // Save users to localStorage
-    const saveUsers = (users) => {
-        localStorage.setItem('fireApp_users', JSON.stringify(users));
-    };
-
-    // Register a new user
-    const registerUser = (username, password) => {
+    const registerUser = useCallback(async (username, password) => {
         if (!username || username.trim() === '') {
-            return { success: false, message: 'Por favor ingresa un nombre de usuario' };
-        }
-        
-        if (!password || password.length < 4) {
-            return { success: false, message: 'La contraseña debe tener al menos 4 caracteres' };
+            return { success: false, message: t('auth.messages.usernameRequired') };
         }
 
-        const users = getAllUsers();
-        const usernameLower = username.toLowerCase().trim();
-
-        if (users[usernameLower]) {
-            return { success: false, message: 'Este usuario ya existe' };
+        if (!password || password.length < 6) {
+            return { success: false, message: t('auth.messages.passwordMinLength') };
         }
 
-        // Store user with hashed password (simple hash for demo)
-        users[usernameLower] = {
-            username: username,
-            password: btoa(password) // Simple base64 encoding (not secure for production)
-        };
+        try {
+            const email = formatUsernameEmail(username);
+            const credentials = await createUserWithEmailAndPassword(auth, email, password);
+            await updateProfile(credentials.user, { displayName: username.trim() });
 
-        saveUsers(users);
-        return { success: true, message: 'Usuario registrado exitosamente' };
-    };
+            return { success: true, message: t('auth.messages.registerSuccess') };
+        } catch (error) {
+            return { success: false, message: getFriendlyMessage(error.code, error.message, t) };
+        }
+    }, [t]);
 
-    // Login user
-    const loginUser = (username, password) => {
+    const loginUser = useCallback(async (username, password) => {
         if (!username || username.trim() === '') {
-            return { success: false, message: 'Por favor ingresa un nombre de usuario' };
+            return { success: false, message: t('auth.messages.usernameRequired') };
         }
 
         if (!password) {
-            return { success: false, message: 'Por favor ingresa una contraseña' };
+            return { success: false, message: t('auth.messages.passwordRequired') };
         }
 
-        const users = getAllUsers();
-        const usernameLower = username.toLowerCase().trim();
-
-        if (!users[usernameLower]) {
-            return { success: false, message: 'Usuario no encontrado' };
+        try {
+            const email = formatUsernameEmail(username);
+            await signInWithEmailAndPassword(auth, email, password);
+            return { success: true, message: t('auth.messages.loginSuccess') };
+        } catch (error) {
+            return { success: false, message: getFriendlyMessage(error.code, error.message, t) };
         }
+    }, [t]);
 
-        const storedPassword = users[usernameLower].password;
-        const providedPassword = btoa(password);
-
-        if (storedPassword !== providedPassword) {
-            return { success: false, message: 'Contraseña incorrecta' };
-        }
-
-        const user = { 
-            id: usernameLower, 
-            name: users[usernameLower].username
-        };
-
-        setCurrentUser(user);
-        localStorage.setItem('fireApp_currentUser', JSON.stringify(user));
-        return { success: true, message: 'Sesión iniciada' };
-    };
-
-    // Logout user
-    const logoutUser = () => {
-        setCurrentUser(null);
-        localStorage.removeItem('fireApp_currentUser');
-    };
+    const logoutUser = useCallback(async () => {
+        await signOut(auth);
+    }, []);
 
     return {
         currentUser,

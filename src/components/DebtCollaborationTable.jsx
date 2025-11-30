@@ -6,7 +6,7 @@ import { defaultCategories } from '../constants';
 export const DebtCollaborationTable = ({ data, updateData, language, exchangeRates, t }) => {
     const { selectedMonth, editMode } = useMonthNavigation();
     const isCurrentMonth = selectedMonth && new Date(selectedMonth.id) >= new Date(new Date().getFullYear(), new Date().getMonth());
-    const canEdit = true; // Permitir edición en cualquier mes
+    const canEdit = editMode;
 
     if (!selectedMonth) {
         return (
@@ -37,7 +37,7 @@ export const DebtCollaborationTable = ({ data, updateData, language, exchangeRat
                                 <td className="px-0 py-0">
                                     <input
                                         type="number"
-                                        value={selectedMonth?.debtCollaboration?.[cat] || ''}
+                                        value={selectedMonth?.debtCollaboration?.[cat] ?? ''}
                                         placeholder="0"
                                         onChange={(e) => {
                                             if (!canEdit) return;
@@ -45,8 +45,8 @@ export const DebtCollaborationTable = ({ data, updateData, language, exchangeRat
                                         }}
                                         disabled={!canEdit}
                                         className={`w-full px-4 py-3 text-right border-none outline-none transition-colors ${canEdit
-                                                ? 'bg-transparent focus:ring-2 focus:ring-inset focus:ring-blue-500 cursor-text'
-                                                : 'bg-slate-100 text-slate-500 cursor-not-allowed'
+                                            ? 'bg-transparent focus:ring-2 focus:ring-inset focus:ring-blue-500 cursor-text'
+                                            : 'bg-slate-100 text-slate-500 cursor-not-allowed'
                                             }`}
                                     />
                                 </td>
