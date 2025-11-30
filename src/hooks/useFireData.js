@@ -335,9 +335,9 @@ export const useFireData = (currentUserId) => {
                 debtCollaboration: { ...lastMonth.debtCollaboration },
             };
 
-            setData([...data, newEntry]);
+            setData(prevData => [...prevData, newEntry]);
         }
-    }, [data]);
+    }, [data, currentCategories.income, currentCategories.taxes, currentCategories.expenses]);
 
     // Save data to Firestore on change
     useEffect(() => {
@@ -360,7 +360,7 @@ export const useFireData = (currentUserId) => {
             localStorage.setItem(storageKey, JSON.stringify(data));
             console.log('Data saved to localStorage:', storageKey);
         }
-    }, [data, currentUserId]);
+    }, [data, currentUserId, getUserDocRef]);
 
     const updateData = (monthId, type, category, value) => {
         setData(prev => prev.map(item => {
@@ -422,18 +422,7 @@ export const useFireData = (currentUserId) => {
         }));
     };
 
-    const isMonthZero = (month) => {
-        if (!month) return true;
-        const totalIncome = Object.values(month.income || {}).reduce((a, b) => a + Number(b || 0), 0);
-        const totalTaxes = Object.values(month.taxes || {}).reduce((a, b) => a + Number(b || 0), 0);
-        const totalExpenses = Object.values(month.expenses || {}).reduce((a, b) => a + Number(b || 0), 0);
-        const totalAssets = Object.values(month.assets || {}).reduce((a, b) => a + Number(b || 0), 0);
-        const totalLiabilities = Object.values(month.liabilities || {}).reduce((a, b) => a + Number(b || 0), 0);
-
-        return totalIncome === 0 && totalTaxes === 0 && totalExpenses === 0 &&
-            totalAssets === 0 && totalLiabilities === 0;
-    };
-
+    
     const addPreviousMonth = () => {
         if (data.length === 0) return;
 

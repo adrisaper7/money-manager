@@ -132,7 +132,7 @@ export const useFireStats = (data, config) => {
                 yearlySpend: yearlySpendDelta
             }
         };
-    }, [data, config, language]);
+    }, [data, config, language, investmentCategories]);
 
     return stats;
 };

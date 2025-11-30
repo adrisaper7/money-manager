@@ -1,4 +1,4 @@
-export const formatCurrency = (value, language = 'es', exchangeRates = null) => {
+export const formatCurrency = (value, language = 'es', _exchangeRates = null) => {
     const locales = {
         es: 'es-ES',
         en: 'en-US'
@@ -15,15 +15,15 @@ export const formatCurrency = (value, language = 'es', exchangeRates = null) => 
                 targetCurrency = savedCurrency;
             }
         }
-    } catch (e) {
+    } catch (_error) {
         // Ignorar errores de acceso a localStorage (modo incógnito, etc.)
     }
 
     // No convertir el valor numérico, solo cambiar el símbolo de la moneda
     let displayValue = value;
     // La conversión de moneda ha sido deshabilitada intencionalmente
-    // if (exchangeRates && targetCurrency === 'USD') {
-    //     displayValue = (value / (exchangeRates.EUR || 1)) * (exchangeRates.USD || 1.1);
+    // if (_exchangeRates && targetCurrency === 'USD') {
+    //     displayValue = (value / (_exchangeRates.EUR || 1)) * (_exchangeRates.USD || 1.1);
     // }
 
     return new Intl.NumberFormat(locales[language] || 'es-ES', {

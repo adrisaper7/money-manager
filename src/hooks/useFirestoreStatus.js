@@ -23,13 +23,15 @@ export const useFirestoreStatus = (currentUserId) => {
             } catch (error) {
                 console.error('Firestore access error:', error);
                 setIsFirestoreAvailable(false);
+                let errorMsg = '';
                 if (error.code === 'permission-denied') {
-                    setErrorMessage('Firestore rules not configured. Data will be saved locally only.');
+                    errorMsg = 'Firestore rules not configured. Data will be saved locally only.';
                 } else if (error.code === 'unavailable') {
-                    setErrorMessage('Firestore unavailable. Check your connection.');
+                    errorMsg = 'Firestore unavailable. Check your connection.';
                 } else {
-                    setErrorMessage(`Firestore error: ${error.message}`);
+                    errorMsg = `Firestore error: ${error.message}`;
                 }
+                setErrorMessage(errorMsg);
             }
         };
 

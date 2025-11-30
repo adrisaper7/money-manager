@@ -15,11 +15,8 @@ export const useLanguage = () => {
             // Try to detect browser language
             const browserLanguage = navigator.language.split('-')[0];
             
-            if (browserLanguage === 'es') {
-                setLanguage('es');
-            } else {
-                setLanguage('en');
-            }
+            const detectedLanguage = browserLanguage === 'es' ? 'es' : 'en';
+            setLanguage(detectedLanguage);
         }
         setIsLoading(false);
     }, []);
