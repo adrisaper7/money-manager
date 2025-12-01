@@ -81,7 +81,7 @@ export const useFireStats = (data, config) => {
         const savings = netIncome - totalExpenses;
 
 
-        // Calculate median savings rate for the current year
+        // Calculate average savings rate for the current year
         const currentYearMonths = data.filter(month => month.id.startsWith(`${currentYear}-`));
         const yearlySavingsRates = currentYearMonths.map(month => {
             const mGrossIncome = sumValues(month.income);
@@ -90,16 +90,12 @@ export const useFireStats = (data, config) => {
             const mNetIncome = mGrossIncome - mTaxes;
             const mSavings = mNetIncome - mExpenses;
             return mNetIncome > 0 ? (mSavings / mNetIncome) * 100 : 0;
-        }).sort((a, b) => a - b);
+        });
 
         let savingsRate = 0;
         if (yearlySavingsRates.length > 0) {
-            const mid = Math.floor(yearlySavingsRates.length / 2);
-            if (yearlySavingsRates.length % 2 !== 0) {
-                savingsRate = yearlySavingsRates[mid];
-            } else {
-                savingsRate = (yearlySavingsRates[mid - 1] + yearlySavingsRates[mid]) / 2;
-            }
+            const totalRate = yearlySavingsRates.reduce((acc, rate) => acc + rate, 0);
+            savingsRate = totalRate / yearlySavingsRates.length;
         }
 
         // Yearly Average Spend (Last 12 months or available)
