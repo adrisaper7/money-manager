@@ -466,39 +466,8 @@ export const useFireData = (currentUserId) => {
                     };
                 }
 
-                // Auto-calculate Bank ONLY if we're NOT editing Bank directly
-                const bankCategory = language === 'es' ? 'Banco' : 'Bank';
-                // Auto-calculate Bank when editing: income, taxes, expenses, other assets, or debt collaboration
-                // But NOT when directly editing Bank itself
-                const shouldAutoCalculateBank = (type === 'assets' && category !== bankCategory) ||
-                    type === 'debtCollaboration' ||
-                    type === 'income' ||
-                    type === 'taxes' ||
-                    type === 'expenses';
-
-                if (shouldAutoCalculateBank) {
-                    const grossIncome = Object.values(updatedItem.income || {}).reduce((a, b) => a + Number(b), 0);
-                    const taxes = Object.values(updatedItem.taxes || {}).reduce((a, b) => a + Number(b), 0);
-                    const expenses = Object.values(updatedItem.expenses || {}).reduce((a, b) => a + Number(b), 0);
-                    const netIncome = grossIncome - taxes;
-                    const availableFunds = netIncome - expenses;
-
-                    // Money assigned to investments (except Bank) - exclude Bank from the sum
-                    const otherInvestments = Object.entries(updatedItem.assets || {})
-                        .filter(([key]) => key !== bankCategory)
-                        .reduce((acc, [, val]) => acc + Number(val || 0), 0);
-
-                    const assignedToDebt = Object.values(updatedItem.debtCollaboration || {}).reduce((a, b) => a + Number(b), 0);
-                    const totalOtherAssignments = otherInvestments + assignedToDebt;
-
-                    // Bank = available funds - money assigned to other investments
-                    const newBankValue = Math.max(0, availableFunds - totalOtherAssignments);
-                    updatedItem.assets = {
-                        ...updatedItem.assets,
-                        [bankCategory]: newBankValue
-                    };
-                }
-                // If editing Bank directly, the value is already updated above in line 389
+                // No auto-calculation for Bank - it's independent
+                // Bank value is only updated when directly edited
 
                 console.log('updatedItem for month', monthId, updatedItem);
                 return updatedItem;
