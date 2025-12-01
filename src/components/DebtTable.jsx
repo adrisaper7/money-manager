@@ -38,7 +38,7 @@ export const DebtTable = ({
         const debtToAssetRatio = totalAssets > 0 ? (totalDebt / totalAssets) * 100 : 0;
 
         return { totalDebt, debtReduction, debtToAssetRatio };
-    }, [historicalData, selectedMonthIndex, JSON.stringify(historicalData?.[selectedMonthIndex]?.liabilities), JSON.stringify(historicalData?.[selectedMonthIndex - 1]?.liabilities)]);
+    }, [historicalData, selectedMonthIndex, JSON.stringify(historicalData?.[selectedMonthIndex]?.liabilities), JSON.stringify(historicalData?.[selectedMonthIndex]?.debtCollaboration)]);
 
     return (
         <div className="space-y-4">
