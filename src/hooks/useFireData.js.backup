@@ -4,13 +4,164 @@ import { defaultCategories, getCategoriesForLanguage } from '../constants';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useFirestoreStatus } from './useFirestoreStatus';
+import { useLanguage } from './useLanguage';
 
 export const useFireData = (currentUserId) => {
     const [data, setData] = useState([]);
     const { isFirestoreAvailable, errorMessage } = useFirestoreStatus(currentUserId);
+    const { language } = useLanguage();
 
-    // Get categories
-    const currentCategories = useMemo(() => getCategoriesForLanguage(), []);
+    // Get categories for current language
+    const currentCategories = useMemo(() => getCategoriesForLanguage(language), [language]);
+
+    // Helper function to check if data needs migration
+    const needsMigration = (data, fromLang, toLang) => {
+        if (fromLang === toLang) return false;
+        if (!data || data.length === 0) return false;
+
+        const fromCategories = getCategoriesForLanguage(fromLang);
+        const toCategories = getCategoriesForLanguage(toLang);
+
+        // Check if first month has categories from the target language
+        const firstMonth = data[0];
+        if (!firstMonth || !firstMonth.assets) return false;
+
+        // Check if any asset category matches target language
+        return !toCategories.assets.some(cat => firstMonth.assets.hasOwnProperty(cat));
+    };
+
+    // Helper function to migrate data from one language to another
+    const migrateDataCategories = (data, fromLang = 'es', toLang = language) => {
+        if (!needsMigration(data, fromLang, toLang)) return data;
+
+        const fromCategories = getCategoriesForLanguage(fromLang);
+        const toCategories = getCategoriesForLanguage(toLang);
+
+        return data.map(month => {
+            const migratedMonth = { ...month };
+
+            // Build a mapping from old category names to values
+            const categoryMapping = {
+                'es_en': {
+                    'Banco': 'Bank',
+                    'Fondo Emergencia': 'Emergency Fund',
+                    'Cartera Inversión': 'Investment Portfolio',
+                    'Fondos Indexados': 'Index Funds',
+                    'Planes Pensiones': 'Pension Plans',
+                    'Inmobiliario': 'Real Estate',
+                    'Cripto': 'Crypto',
+                    'Hipoteca': 'Mortgage',
+                    'Préstamo Coche': 'Car Loan',
+                    'Tarjetas': 'Credit Cards',
+                    'Otros': 'Other',
+                    'Salario Bruto': 'Gross Salary',
+                    'Bonus': 'Bonus',
+                    'Dividendos': 'Dividends',
+                    'Negocio': 'Business',
+                    'IRPF': 'Income Tax',
+                    'Seguridad Social': 'Social Security',
+                    'Cuota Autónomos': 'Self-Employment Tax',
+                    'Vivienda': 'Housing',
+                    'Gas (Hogar)': 'Gas (Home)',
+                    'Electricidad': 'Electric',
+                    'Internet': 'Internet',
+                    'Seguros': 'Insurance',
+                    'Supermercado': 'Groceries',
+                    'Comer fuera': 'Eating Out',
+                    'Gasolina': 'Gas (Car)',
+                    'Transporte compartido': 'Rideshare',
+                    'Transporte público': 'Public Transit',
+                    'Peajes': 'Tolls',
+                    'Entretenimiento': 'Entertainment',
+                    'Ropa': 'Clothing',
+                    'Cuidado personal': 'Self Care',
+                    'Tintorería': 'Dry Cleaning',
+                    'Gimnasio': 'Gym',
+                    'Música': 'Music',
+                    'Educación': 'Education',
+                    'Médico': 'Medical',
+                    'Regalos': 'Gifts',
+                    'Donaciones': 'Charity',
+                    'Comisiones': 'Fees',
+                    'Varios': 'Misc'
+                },
+                'en_es': {
+                    'Bank': 'Banco',
+                    'Emergency Fund': 'Fondo Emergencia',
+                    'Investment Portfolio': 'Cartera Inversión',
+                    'Index Funds': 'Fondos Indexados',
+                    'Pension Plans': 'Planes Pensiones',
+                    'Real Estate': 'Inmobiliario',
+                    'Crypto': 'Cripto',
+                    'Mortgage': 'Hipoteca',
+                    'Car Loan': 'Préstamo Coche',
+                    'Credit Cards': 'Tarjetas',
+                    'Other': 'Otros',
+                    'Gross Salary': 'Salario Bruto',
+                    'Bonus': 'Bonus',
+                    'Dividends': 'Dividendos',
+                    'Business': 'Negocio',
+                    'Income Tax': 'IRPF',
+                    'Social Security': 'Seguridad Social',
+                    'Self-Employment Tax': 'Cuota Autónomos',
+                    'Housing': 'Vivienda',
+                    'Gas (Home)': 'Gas (Hogar)',
+                    'Electric': 'Electricidad',
+                    'Internet': 'Internet',
+                    'Insurance': 'Seguros',
+                    'Groceries': 'Supermercado',
+                    'Eating Out': 'Comer fuera',
+                    'Gas (Car)': 'Gasolina',
+                    'Rideshare': 'Transporte compartido',
+                    'Public Transit': 'Transporte público',
+                    'Tolls': 'Peajes',
+                    'Entertainment': 'Entretenimiento',
+                    'Clothing': 'Ropa',
+                    'Self Care': 'Cuidado personal',
+                    'Dry Cleaning': 'Tintorería',
+                    'Gym': 'Gimnasio',
+                    'Music': 'Música',
+                    'Education': 'Educación',
+                    'Medical': 'Médico',
+                    'Gifts': 'Regalos',
+                    'Charity': 'Donaciones',
+                    'Fees': 'Comisiones',
+                    'Misc': 'Varios'
+                }
+            };
+
+            // Migrate each category type
+            ['income', 'taxes', 'expenses', 'assets', 'liabilities'].forEach(type => {
+                const migratedValues = {};
+                const mapKey = `${fromLang}_${toLang}`;
+                const map = categoryMapping[mapKey] || {};
+
+                // Iterate over old data and find each category's new name
+                Object.entries(month[type] || {}).forEach(([oldCatName, value]) => {
+                    const newCatName = map[oldCatName] || oldCatName;
+                    migratedValues[newCatName] = value;
+                });
+
+                migratedMonth[type] = migratedValues;
+            });
+
+            // Migrate debtCollaboration (liabilities only)
+            if (migratedMonth.debtCollaboration) {
+                const migratedDebtCollaboration = {};
+                const mapKey = `${fromLang}_${toLang}`;
+                const map = categoryMapping[mapKey] || {};
+
+                Object.entries(month.debtCollaboration || {}).forEach(([oldCatName, value]) => {
+                    const newCatName = map[oldCatName] || oldCatName;
+                    migratedDebtCollaboration[newCatName] = value;
+                });
+
+                migratedMonth.debtCollaboration = migratedDebtCollaboration;
+            }
+
+            return migratedMonth;
+        });
+    };
 
     // Helper function to generate initial data (1 month)
     const generateInitialData = () => {
@@ -47,7 +198,14 @@ export const useFireData = (currentUserId) => {
             const storageKey = 'fireData_es_v1';
             const savedData = localStorage.getItem(storageKey);
             if (savedData) {
-                setData(JSON.parse(savedData));
+                let parsedData = JSON.parse(savedData);
+                parsedData = parsedData.map(month => ({
+                    ...month,
+                    debtCollaboration: month.debtCollaboration || currentCategories.liabilities.reduce((acc, curr) => ({ ...acc, [curr]: 0 }), {})
+                }));
+                // Migrate data to current language if needed
+                const migratedData = migrateDataCategories(parsedData, 'es', language);
+                setData(migratedData);
             } else {
                 console.log('No user and no data, creating initial dataset...');
                 const initialData = generateInitialData();
@@ -62,13 +220,14 @@ export const useFireData = (currentUserId) => {
             const storageKey = `fireData_${currentUserId}_v1`;
             const savedData = localStorage.getItem(storageKey);
             if (savedData) {
-                setData(JSON.parse(savedData));
                 let parsedData = JSON.parse(savedData);
                 parsedData = parsedData.map(month => ({
                     ...month,
                     debtCollaboration: month.debtCollaboration || currentCategories.liabilities.reduce((acc, curr) => ({ ...acc, [curr]: 0 }), {})
                 }));
-                setData(parsedData);
+                // Migrate data to current language if needed
+                const migratedData = migrateDataCategories(parsedData, 'es', language);
+                setData(migratedData);
             } else {
                 console.log('No data in localStorage, creating initial dataset...');
                 const initialData = generateInitialData();
@@ -89,7 +248,9 @@ export const useFireData = (currentUserId) => {
                 if (docSnapshot.exists()) {
                     const firestoreData = docSnapshot.data().data || [];
                     console.log('Data loaded from Firestore:', firestoreData);
-                    setData(firestoreData);
+                    // Migrate data to current language if needed (assuming Firestore data is in Spanish)
+                    const migratedData = migrateDataCategories(firestoreData, 'es', language);
+                    setData(migratedData);
                 } else {
                     console.log('No data in Firestore, checking localStorage...');
                     // No data in Firestore, try localStorage migration
@@ -102,9 +263,11 @@ export const useFireData = (currentUserId) => {
                             ...month,
                             debtCollaboration: month.debtCollaboration || currentCategories.liabilities.reduce((acc, curr) => ({ ...acc, [curr]: 0 }), {})
                         }));
-                        setData(parsedData);
-                        // Save to Firestore
-                        setDoc(userDocRef, { data: parsedData })
+                        // Migrate data to current language if needed
+                        const migratedData = migrateDataCategories(parsedData, 'es', language);
+                        setData(migratedData);
+                        // Migrate to Firestore (save in current language structure)
+                        setDoc(userDocRef, { data: migratedData })
                             .then(() => console.log('Data migrated to Firestore successfully'))
                             .catch(error => console.error('Error migrating data to Firestore:', error));
                     } else {
@@ -129,7 +292,9 @@ export const useFireData = (currentUserId) => {
                         ...month,
                         debtCollaboration: month.debtCollaboration || currentCategories.liabilities.reduce((acc, curr) => ({ ...acc, [curr]: 0 }), {})
                     }));
-                    setData(parsedData);
+                    // Migrate data to current language if needed
+                    const migratedData = migrateDataCategories(parsedData, 'es', language);
+                    setData(migratedData);
                     console.log('Loaded data from localStorage as fallback');
                 } else {
                     console.log('No data in localStorage, creating initial dataset...');
@@ -140,9 +305,15 @@ export const useFireData = (currentUserId) => {
 
             return () => unsubscribe();
         }
-    }, [currentUserId, isFirestoreAvailable]);
+    }, [currentUserId, isFirestoreAvailable, language]);
 
     // Migrate data when language changes
+    useEffect(() => {
+        if (data.length > 0 && needsMigration(data, 'es', language)) {
+            const migratedData = migrateDataCategories(data, 'es', language);
+            setData(migratedData);
+        }
+    }, [language]); // Remove data from dependencies to prevent infinite loop
 
     // Auto-create current month if it doesn't exist
     useEffect(() => {

@@ -1,17 +1,16 @@
-export const formatCurrency = (value, language = 'es', _exchangeRates = null) => {
+export const formatCurrency = (value, _language = 'en', _exchangeRates = null) => {
     const locales = {
-        es: 'es-ES',
         en: 'en-US'
     };
 
-    // Moneda por defecto según idioma (para compatibilidad hacia atrás)
-    let targetCurrency = language === 'en' ? 'USD' : 'EUR';
+    // Default currency (USD for English)
+    let targetCurrency = 'USD';
 
     // Si el usuario ha elegido una moneda en la configuración, usarla
     try {
         if (typeof window !== 'undefined' && window.localStorage) {
             const savedCurrency = localStorage.getItem('fireApp_currency');
-            if (savedCurrency === 'EUR' || savedCurrency === 'USD') {
+            if (savedCurrency === 'USD') {
                 targetCurrency = savedCurrency;
             }
         }
@@ -26,7 +25,7 @@ export const formatCurrency = (value, language = 'es', _exchangeRates = null) =>
     //     displayValue = (value / (_exchangeRates.EUR || 1)) * (_exchangeRates.USD || 1.1);
     // }
 
-    return new Intl.NumberFormat(locales[language] || 'es-ES', {
+    return new Intl.NumberFormat(locales.en || 'en-US', {
         style: 'currency',
         currency: targetCurrency,
         minimumFractionDigits: 0,
@@ -34,13 +33,12 @@ export const formatCurrency = (value, language = 'es', _exchangeRates = null) =>
     }).format(displayValue);
 };
 
-export const formatPercent = (value, language = 'es') => {
+export const formatPercent = (value, _language = 'en') => {
     const locales = {
-        es: 'es-ES',
         en: 'en-US'
     };
 
-    return new Intl.NumberFormat(locales[language] || 'es-ES', {
+    return new Intl.NumberFormat(locales.en || 'en-US', {
         style: 'percent',
         minimumFractionDigits: 1,
         maximumFractionDigits: 1,

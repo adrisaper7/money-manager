@@ -22,12 +22,12 @@ export const MonthlyInvestmentAllocator = ({ data, stats, updateData, language, 
         setError('');
 
         if (!monthId) {
-            setError('No hay mes actual disponible.');
+            setError('No current month available.');
             return;
         }
 
         if (availableFunds <= 0) {
-            setError(`No tienes fondos disponibles para asignar. Disponible: ${formatCurrency(availableFunds, language, exchangeRates)}`);
+            setError(`You don't have available funds to assign. Available: ${formatCurrency(availableFunds, 'en', exchangeRates)}`);
             return;
         }
 
@@ -35,17 +35,17 @@ export const MonthlyInvestmentAllocator = ({ data, stats, updateData, language, 
         const newVal = currentVal + availableFunds;
 
         updateData(monthId, 'assets', category, newVal);
-        setMessage(`Asignados ${formatCurrency(availableFunds, language, exchangeRates)} a ${category}.`);
+        setMessage(`Assigned ${formatCurrency(availableFunds, 'en', exchangeRates)} to ${category}.`);
     };
 
     return (
         <div className="bg-white p-4 rounded-lg border border-slate-200">
-            <h3 className="font-semibold text-slate-800 mb-4">Asignar ahorro mensual</h3>
-            <div className="text-sm text-slate-600 mb-4">Dinero neto este mes: <span className="font-mono font-medium text-lg text-slate-800">{formatCurrency(availableFunds, language, exchangeRates)}</span></div>
+            <h3 className="font-semibold text-slate-800 mb-4">Assign monthly savings</h3>
+            <div className="text-sm text-slate-600 mb-4">Net money this month: <span className="font-mono font-medium text-lg text-slate-800">{formatCurrency(availableFunds, 'en', exchangeRates)}</span></div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-end">
                 <div>
-                    <label className="block text-xs text-slate-600 mb-1">Categoría de inversión</label>
+                    <label className="block text-xs text-slate-600 mb-1">Investment category</label>
                     <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full p-2 border border-slate-200 rounded">
                         {investmentCategories.map(cat => (
                             <option key={cat} value={cat}>{cat}</option>

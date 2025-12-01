@@ -93,25 +93,25 @@ export const FireProjectionChart = ({ data, config, language, exchangeRates }) =
     return (
         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
             <div className="mb-6">
-                <h3 className="text-lg font-bold text-slate-800">Proyección de Patrimonio</h3>
+                <h3 className="text-lg font-bold text-slate-800">Net Worth Projection</h3>
                 <div className="mt-2 flex flex-wrap gap-4 text-sm text-slate-600">
                     <div className="bg-slate-50 px-3 py-1 rounded-lg border border-slate-100">
-                        <span className="block text-xs text-slate-400">Inversión Mensual</span>
-                        <span className="font-semibold text-slate-700">{formatCurrency(avgSavings, language, exchangeRates)}</span>
+                        <span className="block text-xs text-slate-400">Monthly Investment</span>
+                        <span className="font-semibold text-slate-700">{formatCurrency(avgSavings, 'en', exchangeRates)}</span>
                     </div>
                     <div className="bg-slate-50 px-3 py-1 rounded-lg border border-slate-100">
-                        <span className="block text-xs text-slate-400">Meta</span>
-                        <span className="font-semibold text-slate-700">{formatCurrency(targetAmount, language, exchangeRates)}</span>
+                        <span className="block text-xs text-slate-400">Target</span>
+                        <span className="font-semibold text-slate-700">{formatCurrency(targetAmount, 'en', exchangeRates)}</span>
                     </div>
                     {reachedYear ? (
                         <div className="bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100">
-                            <span className="block text-xs text-emerald-600">Año Estimado</span>
-                            <span className="font-bold text-emerald-700">{reachedYear} ({reachedYear - new Date().getFullYear()} años)</span>
+                            <span className="block text-xs text-emerald-600">Estimated Year</span>
+                            <span className="font-bold text-emerald-700">{reachedYear} ({reachedYear - new Date().getFullYear()} years)</span>
                         </div>
                     ) : (
                         <div className="bg-amber-50 px-3 py-1 rounded-lg border border-amber-100">
-                            <span className="block text-xs text-amber-600">Proyección</span>
-                            <span className="font-bold text-amber-700">&gt; 50 años</span>
+                            <span className="block text-xs text-amber-600">Projection</span>
+                            <span className="font-bold text-amber-700">&gt; 50 years</span>
                         </div>
                     )}
                 </div>
@@ -142,10 +142,10 @@ export const FireProjectionChart = ({ data, config, language, exchangeRates }) =
                             fontSize={12}
                             tickLine={false}
                             axisLine={false}
-                            tickFormatter={(val) => formatCurrency(val, language, exchangeRates).replace(/\D00(?=\D*$)/, '')} // Simplify large numbers
+                            tickFormatter={(val) => formatCurrency(val, 'en', exchangeRates).replace(/\D00(?=\D*$)/, '')} // Simplify large numbers
                         />
                         <Tooltip
-                            formatter={(value) => formatCurrency(value, language, exchangeRates)}
+                            formatter={(value) => formatCurrency(value, 'en', exchangeRates)}
                             labelFormatter={(label) => `Año ${label}`}
                             contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0' }}
                         />

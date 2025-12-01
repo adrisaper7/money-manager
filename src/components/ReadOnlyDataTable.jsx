@@ -23,8 +23,8 @@ export const ReadOnlyDataTable = ({ type, categories, title, language, exchangeR
                 <table className="w-full text-sm text-left border-collapse">
                     <thead className="bg-slate-50 text-slate-600">
                         <tr>
-                            <th className="px-4 py-3 font-semibold border-b border-r border-slate-200 text-left">Categoría</th>
-                            <th className="px-4 py-3 font-semibold border-b border-slate-200 text-right">Valor</th>
+                            <th className="px-4 py-3 font-semibold border-b border-r border-slate-200 text-left">Category</th>
+                            <th className="px-4 py-3 font-semibold border-b border-slate-200 text-right">Value</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200">
@@ -32,14 +32,14 @@ export const ReadOnlyDataTable = ({ type, categories, title, language, exchangeR
                             <tr key={cat} className="hover:bg-slate-50 transition-colors">
                                 <td className="px-4 py-3 font-medium text-slate-900 border-r border-slate-200">{cat}</td>
                                 <td className="px-4 py-3 text-right font-mono text-slate-700">
-                                    {formatCurrency(selectedMonth?.[type]?.[cat] || 0, language, exchangeRates)}
+                                    {formatCurrency(selectedMonth?.[type]?.[cat] || 0, 'en', exchangeRates)}
                                 </td>
                             </tr>
                         ))}
                         <tr className="bg-slate-100 font-bold">
                             <td className="px-4 py-3 text-slate-900 border-r border-slate-200">Total</td>
                             <td className="px-4 py-3 text-right text-slate-900">
-                                {formatCurrency(Object.values(selectedMonth?.[type] || {}).reduce((a, b) => a + Number(b), 0), language, exchangeRates)}
+                                {formatCurrency(Object.values(selectedMonth?.[type] || {}).reduce((a, b) => a + Number(b), 0), 'en', exchangeRates)}
                             </td>
                         </tr>
                     </tbody>

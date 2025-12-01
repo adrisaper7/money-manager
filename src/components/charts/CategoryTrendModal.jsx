@@ -36,10 +36,10 @@ export const CategoryTrendModal = ({ isOpen, onClose, title, data, language, exc
                                     fontSize={12}
                                     tickLine={false}
                                     axisLine={false}
-                                    tickFormatter={(val) => formatCurrency(val, language, exchangeRates).replace(/\D00(?=\D*$)/, '')}
+                                    tickFormatter={(val) => formatCurrency(val, 'en', exchangeRates).replace(/\D00(?=\D*$)/, '')}
                                 />
                                 <Tooltip
-                                    formatter={(value) => formatCurrency(value, language, exchangeRates)}
+                                    formatter={(value) => formatCurrency(value, 'en', exchangeRates)}
                                     contentStyle={{
                                         backgroundColor: '#fff',
                                         borderRadius: '8px',

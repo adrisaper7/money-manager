@@ -55,7 +55,7 @@ export const DataEntryTable = ({
     const formatSecondaryValue = (value) => {
         if (!secondaryColumn) return '';
         if (secondaryColumn.formatValue) return secondaryColumn.formatValue(value);
-        return formatCurrency(value, language, exchangeRates);
+        return formatCurrency(value, 'en', exchangeRates);
     };
 
     const hasSecondaryColumn = Boolean(secondaryColumn);
@@ -90,8 +90,8 @@ export const DataEntryTable = ({
                 <table className="w-full text-sm text-left border-collapse">
                     <thead className="bg-slate-50 text-slate-600">
                         <tr>
-                            <th className="px-4 py-3 font-semibold border-b border-r border-slate-200 text-left">Categoría</th>
-                            <th className="px-4 py-3 font-semibold border-b border-slate-200 text-right">Valor</th>
+                            <th className="px-4 py-3 font-semibold border-b border-r border-slate-200 text-left">Category</th>
+                            <th className="px-4 py-3 font-semibold border-b border-slate-200 text-right">Value</th>
                             {hasSecondaryColumn && (
                                 <th className="px-4 py-3 font-semibold border-b border-slate-200 text-right">
                                     {secondaryColumn.header}
@@ -157,7 +157,7 @@ export const DataEntryTable = ({
                         <tr className="bg-slate-100 font-bold">
                             <td className="px-4 py-3 text-slate-900 border-r border-slate-200">Total</td>
                             <td className="px-4 py-3 text-right text-slate-900">
-                                {formatCurrency(Object.values(selectedMonth?.[type] || {}).reduce((a, b) => a + Number(b), 0), language, exchangeRates)}
+                                {formatCurrency(Object.values(selectedMonth?.[type] || {}).reduce((a, b) => a + Number(b), 0), 'en', exchangeRates)}
                             </td>
                             {hasSecondaryColumn && (
                                 <td className="px-4 py-3 text-right text-slate-900">

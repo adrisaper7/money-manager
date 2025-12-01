@@ -32,7 +32,7 @@ export const KPICard = ({ title, value, subtext, icon: Icon, color = "blue", tre
                     <span>{trend.text}</span>
                     {trend.percentText && <span className="opacity-80">({trend.percentText})</span>}
                 </div>
-                <p className="text-[11px] text-slate-400 mt-1">vs {trend.label || 'inicio de año'}</p>
+                <p className="text-[11px] text-slate-400 mt-1">vs {trend.label || 'start of year'}</p>
             </div>
         )}
     </div>

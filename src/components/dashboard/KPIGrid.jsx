@@ -20,7 +20,7 @@ const formatPercentText = (value) => {
     return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
 };
 
-export const KPIGrid = ({ stats, t, language, exchangeRates }) => {
+export const KPIGrid = ({ stats, t, exchangeRates }) => {
     const baselineLabel = stats?.yearComparisons?.baselineLabel;
     const labelText = baselineLabel ? baselineLabel : t('dashboard.startOfYear') || 'inicio de año';
 
@@ -28,47 +28,47 @@ export const KPIGrid = ({ stats, t, language, exchangeRates }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <KPICard
                 title={t('navigation.networth')}
-                value={formatCurrency(stats?.netWorth || 0, language, exchangeRates)}
-                subtext={`${t('networth.assets')}: ${formatCurrency(stats?.totalAssets || 0, language, exchangeRates)} | ${t('networth.liabilities')}: ${formatCurrency(stats?.totalLiabilities || 0, language, exchangeRates)}`}
+                value={formatCurrency(stats?.netWorth || 0, 'en', exchangeRates)}
+                subtext={`${t('networth.assets')}: ${formatCurrency(stats?.totalAssets || 0, 'en', exchangeRates)} | ${t('networth.liabilities')}: ${formatCurrency(stats?.totalLiabilities || 0, 'en', exchangeRates)}`}
                 icon={Wallet}
                 color="emerald"
                 trend={buildTrend(
                     stats?.yearComparisons?.netWorth,
-                    (value) => `${value >= 0 ? '+' : ''}${formatCurrency(Math.abs(value), language, exchangeRates)}`,
+                    (value) => `${value >= 0 ? '+' : ''}${formatCurrency(Math.abs(value), 'en', exchangeRates)}`,
                     (value) => formatPercentText(value),
                     labelText
                 )}
             />
             <KPICard
-                title="Patrimonio Objetivo"
-                value={formatCurrency(stats?.fiNumber || 0, language, exchangeRates)}
-                subtext={`${(stats?.progress || 0).toFixed(1)}% Completado`}
+                title="Target Net Worth"
+                value={formatCurrency(stats?.fiNumber || 0, 'en', exchangeRates)}
+                subtext={`${(stats?.progress || 0).toFixed(1)}% Completed`}
                 icon={Target}
                 color="indigo"
                 trend={buildTrend(
                     stats?.yearComparisons?.assets,
-                    (value) => `${value >= 0 ? '+' : ''}${formatCurrency(Math.abs(value), language, exchangeRates)}`,
+                    (value) => `${value >= 0 ? '+' : ''}${formatCurrency(Math.abs(value), 'en', exchangeRates)}`,
                     (value) => formatPercentText(value),
                     labelText
                 )}
             />
             <KPICard
-                title="Gasto Anual Est."
-                value={formatCurrency(stats?.yearlySpend || 0, language, exchangeRates)}
-                subtext="Basado en media de gastos"
+                title="Estimated Annual Spending"
+                value={formatCurrency(stats?.yearlySpend || 0, 'en', exchangeRates)}
+                subtext="Based on average expenses"
                 icon={Activity}
                 color="amber"
                 trend={buildTrend(
                     stats?.yearComparisons?.yearlySpend,
-                    (value) => `${value >= 0 ? '+' : ''}${formatCurrency(Math.abs(value), language, exchangeRates)}`,
+                    (value) => `${value >= 0 ? '+' : ''}${formatCurrency(Math.abs(value), 'en', exchangeRates)}`,
                     (value) => formatPercentText(value),
                     labelText
                 )}
             />
             <KPICard
-                title="Tasa de Ahorro"
-                value={formatPercent(stats?.savingsRate || 0, language)}
-                subtext={`Ahorro mes: ${formatCurrency(stats?.savings || 0, language, exchangeRates)}`}
+                title="Savings Rate"
+                value={formatPercent(stats?.savingsRate || 0, 'en')}
+                subtext={`Monthly Savings: ${formatCurrency(stats?.savings || 0, 'en', exchangeRates)}`}
                 icon={TrendingUp}
                 color="blue"
                 trend={buildTrend(

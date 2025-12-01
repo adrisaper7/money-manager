@@ -29,27 +29,27 @@ export const AvailableFundsPanel = ({ data, language, exchangeRates, t }) => {
 
     return (
         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-            <h3 className="text-lg font-semibold text-slate-800 mb-4">Distribución de Fondos</h3>
+            <h3 className="text-lg font-semibold text-slate-800 mb-4">Funds Distribution</h3>
 
             <div className="space-y-4">
                 <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
-                    <span className="text-slate-600">Dinero Disponible (Ingresos - Gastos)</span>
-                    <span className="font-mono font-bold text-slate-800">{formatCurrency(availableFunds, language, exchangeRates)}</span>
+                    <span className="text-slate-600">Available Funds (Income - Expenses)</span>
+                    <span className="font-mono font-bold text-slate-800">{formatCurrency(availableFunds, 'en', exchangeRates)}</span>
                 </div>
 
                 <div className="flex justify-between items-center px-3">
-                    <span className="text-slate-500">Menos: Inversiones y Deudas</span>
-                    <span className="font-mono font-semibold text-slate-600">-{formatCurrency(assignedToOthers, language, exchangeRates)}</span>
+                    <span className="text-slate-500">Less: Investments and Debts</span>
+                    <span className="font-mono font-semibold text-slate-600">-{formatCurrency(assignedToOthers, 'en', exchangeRates)}</span>
                 </div>
 
                 <div className="border-t border-slate-200 pt-3">
                     <div className="flex justify-between items-center p-3 bg-emerald-50 rounded-lg border border-emerald-100">
                         <div>
-                            <span className="block font-bold text-emerald-800">Cash (Restante)</span>
-                            <span className="text-xs text-emerald-600">Se asigna automáticamente a Banco</span>
+                            <span className="block font-bold text-emerald-800">Cash (Remaining)</span>
+                            <span className="text-xs text-emerald-600">Automatically assigned to Bank</span>
                         </div>
                         <span className="font-mono text-xl font-bold text-emerald-700">
-                            {formatCurrency(cash, language, exchangeRates)}
+                            {formatCurrency(cash, 'en', exchangeRates)}
                         </span>
                     </div>
                 </div>

@@ -20,8 +20,8 @@ const ASSET_COLORS = {
     'Crypto': '#ef4444'
 };
 
-export const NetWorthChart = ({ data, language = 'es', exchangeRates = {} }) => {
-    const categories = getCategoriesForLanguage(language);
+export const NetWorthChart = ({ data, exchangeRates = {} }) => {
+    const categories = getCategoriesForLanguage();
     
     const chartData = data.map(row => {
         const result = { monthLabel: row.monthLabel };
@@ -43,7 +43,7 @@ export const NetWorthChart = ({ data, language = 'es', exchangeRates = {} }) => 
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                         <XAxis dataKey="monthLabel" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} angle={-45} textAnchor="end" height={60} />
                         <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `${val / 1000}k€`} />
-                        <Tooltip formatter={(value) => formatCurrency(value, language, exchangeRates)} contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0' }} />
+                        <Tooltip formatter={(value) => formatCurrency(value, 'en', exchangeRates)} contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0' }} />
                         <Legend wrapperStyle={{ fontSize: '11px' }} />
                         {categories.assets.map(asset => (
                             <Bar key={asset} dataKey={asset} stackId="a" fill={ASSET_COLORS[asset]} />
@@ -51,7 +51,7 @@ export const NetWorthChart = ({ data, language = 'es', exchangeRates = {} }) => 
                         <Line
                             type="monotone"
                             dataKey="netWorth"
-                            name={language === 'es' ? 'Patrimonio Neto' : 'Net Worth'}
+                            name="Net Worth"
                             stroke="#64748b"
                             strokeWidth={2}
                             strokeDasharray="3 3"

@@ -4,7 +4,6 @@ import { SettingsView } from './components/SettingsView';
 import { NetWorthView } from './components/views/NetWorthView';
 import { BudgetView } from './components/views/BudgetView';
 import { LoginView } from './components/LoginView';
-import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { Header } from './components/Header';
 import { initialConfig } from './constants';
 import { useFireData } from './hooks/useFireData';
@@ -20,7 +19,7 @@ export default function App() {
   const [config, setConfig] = useState(initialConfig);
 
   const { currentUser, isLoading: userLoading, loginUser, registerUser, logoutUser } = useUser();
-  const { language, isLoading: languageLoading, changeLanguage, t } = useLanguage();
+  const { language, t } = useLanguage();
   const { currency, isLoading: currencyLoading, changeCurrency } = useCurrency();
   const { rates: exchangeRates, isLoading: ratesLoading } = useExchangeRate();
   const { data, updateData, addPreviousMonth, removeLastMonth, loadData, isFirestoreAvailable, errorMessage } = useFireData(currentUser?.id);
@@ -36,7 +35,7 @@ export default function App() {
     }
   };
 
-  if (userLoading || languageLoading || currencyLoading) {
+  if (userLoading || currencyLoading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-slate-600">{t('app.loading')}</div>
@@ -48,9 +47,6 @@ export default function App() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <div className="flex justify-end mb-4">
-            <LanguageSwitcher language={language} onChangeLanguage={changeLanguage} t={t} />
-          </div>
           <div className="bg-white p-8 rounded-lg shadow-lg">
             <h1 className="text-3xl font-bold text-slate-800 mb-2 text-center">{t('app.title')}</h1>
             <p className="text-slate-600 mb-8 text-center">{t('app.subtitle')}</p>
@@ -89,8 +85,6 @@ export default function App() {
         onUpload={handleUpload}
         currentUser={currentUser}
         onLogout={logoutUser}
-        language={language}
-        onChangeLanguage={changeLanguage}
         currency={currency}
         onChangeCurrency={changeCurrency}
         t={t}
@@ -98,7 +92,7 @@ export default function App() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'dashboard' && (
-          <DashboardView stats={stats} data={data} config={config} t={t} language={language} exchangeRates={exchangeRates} />
+          <DashboardView stats={stats} data={data} config={config} t={t} exchangeRates={exchangeRates} />
         )}
 
         {activeTab === 'networth' && (
@@ -109,7 +103,6 @@ export default function App() {
             onRemoveLastMonth={removeLastMonth}
             updateData={updateData}
             t={t}
-            language={language}
             exchangeRates={exchangeRates}
           />
         )}
@@ -122,13 +115,12 @@ export default function App() {
             onRemoveLastMonth={removeLastMonth}
             updateData={updateData}
             t={t}
-            language={language}
             exchangeRates={exchangeRates}
           />
         )}
 
         {activeTab === 'settings' && (
-          <SettingsView config={config} setConfig={setConfig} stats={stats} t={t} language={language} exchangeRates={exchangeRates} data={data} />
+          <SettingsView config={config} setConfig={setConfig} stats={stats} t={t} exchangeRates={exchangeRates} data={data} />
         )}
       </main>
     </div>

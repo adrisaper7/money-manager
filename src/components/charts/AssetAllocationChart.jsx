@@ -19,8 +19,8 @@ const ASSET_COLORS = {
     'Crypto': '#ef4444'
 };
 
-export const AssetAllocationChart = ({ data, language = 'es' }) => {
-    const categories = getCategoriesForLanguage(language);
+export const AssetAllocationChart = ({ data }) => {
+    const categories = getCategoriesForLanguage();
     
     const chartData = data.map(row => {
         const total = Object.values(row.assets || {}).reduce((a, b) => a + Number(b), 0);
@@ -40,7 +40,7 @@ export const AssetAllocationChart = ({ data, language = 'es' }) => {
     return (
         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
             <h3 className="text-lg font-bold text-slate-800 mb-4">
-                {language === 'es' ? 'Asignación de Activos' : 'Asset Allocation'}
+                Asset Allocation
             </h3>
             <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">

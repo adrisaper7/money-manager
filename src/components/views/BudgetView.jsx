@@ -5,8 +5,8 @@ import { MonthNavigationProvider } from '../../contexts/MonthNavigationContext';
 import { getCategoriesForLanguage } from '../../constants';
 import { formatPercent } from '../../utils';
 
-export const BudgetView = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth, updateData, t, language, exchangeRates }) => {
-    const categories = getCategoriesForLanguage(language);
+export const BudgetView = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth, updateData, t, exchangeRates }) => {
+    const categories = getCategoriesForLanguage();
     
     return (
         <MonthNavigationProvider data={data}>
@@ -18,7 +18,7 @@ export const BudgetView = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth,
                     </div>
                     <div className="text-right">
                         <p className="text-sm text-slate-500">{t('budget.savingsRate')}</p>
-                        <p className="text-2xl font-bold text-blue-600">{formatPercent(stats?.savingsRate || 0, language)}</p>
+                        <p className="text-2xl font-bold text-blue-600">{formatPercent(stats?.savingsRate || 0, 'en')}</p>
                     </div>
                 </div>
 
@@ -34,7 +34,6 @@ export const BudgetView = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth,
                         type="income"
                         categories={categories.income}
                         updateData={updateData}
-                        language={language}
                         exchangeRates={exchangeRates}
                     />
                     <DataEntryTable
@@ -42,7 +41,6 @@ export const BudgetView = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth,
                         type="taxes"
                         categories={categories.taxes}
                         updateData={updateData}
-                        language={language}
                         exchangeRates={exchangeRates}
                     />
                     <DataEntryTable
@@ -50,7 +48,6 @@ export const BudgetView = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth,
                         type="expenses"
                         categories={categories.expenses}
                         updateData={updateData}
-                        language={language}
                         exchangeRates={exchangeRates}
                     />
                 </div>

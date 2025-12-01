@@ -5,7 +5,7 @@ import { CalculatedMetrics } from './settings/CalculatedMetrics';
 import { FireProjectionChart } from './charts/FireProjectionChart';
 import { calculatePercentageBasedInvestment } from '../utils';
 
-export const SettingsView = ({ config, setConfig, stats, t, language, exchangeRates, data }) => {
+export const SettingsView = ({ config, setConfig, stats, t, exchangeRates, data }) => {
     const { monthlyInvestment, monthsUsed, averageNetIncome } = useMemo(() => (
         calculatePercentageBasedInvestment({
             data,
@@ -26,19 +26,17 @@ export const SettingsView = ({ config, setConfig, stats, t, language, exchangeRa
                     config={config}
                     setConfig={setConfig}
                     t={t}
-                    language={language}
                     defaultMonthlyInvestment={monthlyInvestment}
                     monthsUsed={monthsUsed}
                     averageNetIncome={averageNetIncome}
                 />
-                <CalculatedMetrics stats={stats} config={config} t={t} language={language} exchangeRates={exchangeRates} />
+                <CalculatedMetrics stats={stats} config={config} t={t} exchangeRates={exchangeRates} />
             </div>
 
             <div className="max-w-7xl mx-auto">
                 <FireProjectionChart
                     data={data}
                     config={config}
-                    language={language}
                     exchangeRates={exchangeRates}
                 />
             </div>

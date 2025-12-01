@@ -45,7 +45,7 @@ export const CategoryTrendGrid = ({
                             <div className="flex items-baseline justify-between mb-3">
                                 <span className="font-semibold text-slate-700">{category}</span>
                                 <span className="text-sm text-slate-500">
-                                    {formatCurrency(latestValue, language, exchangeRates)}
+                                    {formatCurrency(latestValue, 'en', exchangeRates)}
                                 </span>
                             </div>
                             <div className="h-28">
@@ -55,7 +55,7 @@ export const CategoryTrendGrid = ({
                                         <XAxis dataKey="monthLabel" hide />
                                         <YAxis hide domain={[0, 'auto']} />
                                         <Tooltip
-                                            formatter={(value) => formatCurrency(value, language, exchangeRates)}
+                                            formatter={(value) => formatCurrency(value, 'en', exchangeRates)}
                                             labelFormatter={(label) => label}
                                             contentStyle={{
                                                 backgroundColor: '#fff',

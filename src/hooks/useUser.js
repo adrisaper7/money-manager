@@ -21,10 +21,10 @@ const getFriendlyMessage = (code, fallbackMessage, t) => {
         'auth/weak-password': t('auth.messages.passwordMinLength'),
         'auth/user-not-found': t('auth.messages.userNotFound'),
         'auth/wrong-password': t('auth.messages.incorrectPassword'),
-        'auth/too-many-requests': 'Demasiados intentos. Intenta más tarde',
-        'auth/invalid-email': 'El formato del correo es inválido',
-        'auth/network-request-failed': 'No se pudo contactar con el servidor. Revisa tu conexión.',
-        'auth/internal-error': 'El servidor tuvo un problema. Intenta nuevamente en unos segundos.'
+        'auth/too-many-requests': 'Too many requests. Try again later',
+        'auth/invalid-email': 'Email format is invalid',
+        'auth/network-request-failed': 'Could not contact server. Check your connection.',
+        'auth/internal-error': 'The server had a problem. Try again in a few seconds.'
     };
     return messages[code] || fallbackMessage || t('auth.messages.loginSuccess');
 };

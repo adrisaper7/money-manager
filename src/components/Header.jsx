@@ -13,8 +13,6 @@ export const Header = ({
   onUpload, 
   currentUser, 
   onLogout, 
-  language, 
-  onChangeLanguage, 
   currency,
   onChangeCurrency,
   t 
@@ -45,8 +43,6 @@ export const Header = ({
         onClose={() => setIsConfigModalOpen(false)}
         currency={currency}
         onCurrencyChange={onChangeCurrency}
-        language={language}
-        onLanguageChange={onChangeLanguage}
         t={t}
       />
     </>

@@ -4,13 +4,12 @@ export const ConfigInputs = ({
     config,
     setConfig,
     t,
-    language,
     defaultMonthlyInvestment = 0,
     monthsUsed = 0,
     averageNetIncome = 0
 }) => {
     const currentYear = new Date().getFullYear();
-    const currencySymbol = language === 'en' ? '$' : '€';
+    const currencySymbol = '$'; // USD for English
     const monthlyInvestmentValue = defaultMonthlyInvestment ? Math.round(defaultMonthlyInvestment) : 0;
     const annualNetChange = monthlyInvestmentValue ? monthlyInvestmentValue * 12 : 0;
     const investmentRate = config?.investmentRate ?? 0;
@@ -23,7 +22,7 @@ export const ConfigInputs = ({
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Objetivo de Inversión ({currencySymbol})</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Investment Target ({currencySymbol})</label>
                 <input
                     type="number"
                     value={config.targetInvestment || ''}
@@ -31,10 +30,10 @@ export const ConfigInputs = ({
                     className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="1000000"
                 />
-                <p className="text-xs text-slate-400 mt-1">Cantidad que quieres tener invertida en activos que generan retorno</p>
+                <p className="text-xs text-slate-400 mt-1">Amount you want to have invested in income-generating assets</p>
             </div>
             <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Año Objetivo</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Target Year</label>
                 <input
                     type="number"
                     value={config.targetYear || ''}
@@ -43,10 +42,10 @@ export const ConfigInputs = ({
                     placeholder={currentYear + 10}
                     min={currentYear}
                 />
-                <p className="text-xs text-slate-400 mt-1">Año en el que quieres alcanzar este patrimonio</p>
+                <p className="text-xs text-slate-400 mt-1">Year you want to reach this net worth</p>
             </div>
             <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">% de ingresos que quieres invertir</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">% of income you want to invest</label>
                 <input
                     type="number"
                     min="0"
@@ -61,11 +60,11 @@ export const ConfigInputs = ({
                     placeholder="15"
                 />
                 <p className="text-xs text-slate-400 mt-1">
-                    Calculado en base a tu ingreso neto promedio de los últimos {monthsUsed || 1} meses.
+                    Calculated based on your average net income of the last {monthsUsed || 1} months.
                 </p>
             </div>
             <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Inversión mensual estimada ({currencySymbol})</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Estimated monthly investment ({currencySymbol})</label>
                 <input
                     type="number"
                     value={monthlyInvestmentValue}
@@ -74,11 +73,11 @@ export const ConfigInputs = ({
                     disabled
                 />
                 <p className="text-xs text-slate-400 mt-1">
-                    {`Equivale al ${investmentRate}% de un ingreso neto promedio de ${currencySymbol}${Math.round(averageNetIncome || 0).toLocaleString()} (${monthsUsed || 1} meses).`}
+                    Equivalent to {investmentRate}% of an average net income of {currencySymbol}{Math.round(averageNetIncome || 0).toLocaleString()} ({monthsUsed || 1} months).
                 </p>
             </div>
             <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Retorno Anual Esperado (%)</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Expected Annual Return (%)</label>
                 <input
                     type="number"
                     step="0.1"
@@ -87,23 +86,23 @@ export const ConfigInputs = ({
                     className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="7.0"
                 />
-                <p className="text-xs text-slate-400 mt-1">Retorno anual esperado para proyecciones</p>
+                <p className="text-xs text-slate-400 mt-1">Expected annual return for projections</p>
             </div>
             <div className="md:col-span-2">
                 <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 flex flex-col gap-2">
-                    <span className="text-xs uppercase tracking-wide text-blue-500 font-semibold">Estimación basada en los últimos {monthsUsed || 1} meses</span>
+                    <span className="text-xs uppercase tracking-wide text-blue-500 font-semibold">Estimation based on the last {monthsUsed || 1} months</span>
                     <div className="flex flex-wrap items-baseline gap-3">
                         <p className="text-sm text-slate-600">
-                            Ingreso neto promedio: <span className="font-semibold text-slate-800">{currencySymbol}{averageNetIncome ? Math.round(averageNetIncome).toLocaleString() : 0}</span>
+                            Average net income: <span className="font-semibold text-slate-800">{currencySymbol}{averageNetIncome ? Math.round(averageNetIncome).toLocaleString() : 0}</span>
                         </p>
                         <p className="text-sm text-slate-600">
-                            Inversión propuesta ({latestInvestmentRate}%): <span className="font-semibold text-slate-800">{currencySymbol}{suggestedInvestment.toLocaleString()}</span>
+                            Proposed investment ({latestInvestmentRate}%): <span className="font-semibold text-slate-800">{currencySymbol}{suggestedInvestment.toLocaleString()}</span>
                         </p>
                         <p className="text-sm text-slate-600">
-                            Tasa de ahorro anual estimada: <span className="font-semibold text-slate-800">{(investmentRate || 0).toFixed(1)}%</span>
+                            Estimated annual savings rate: <span className="font-semibold text-slate-800">{(investmentRate || 0).toFixed(1)}%</span>
                         </p>
                         <p className="text-sm text-slate-600">
-                            Cambio neto anual estimado: <span className="font-semibold text-slate-800">{currencySymbol}{annualNetChange.toLocaleString()}</span>
+                            Estimated annual net change: <span className="font-semibold text-slate-800">{currencySymbol}{annualNetChange.toLocaleString()}</span>
                         </p>
                     </div>
                 </div>

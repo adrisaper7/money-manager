@@ -22,7 +22,7 @@ export const RunningFIChart = ({ data, config }) => {
 
     return (
         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-            <h3 className="text-lg font-bold text-slate-800 mb-4">Progreso hacia Objetivo de Inversión</h3>
+            <h3 className="text-lg font-bold text-slate-800 mb-4">Progress towards Investment Goal</h3>
             <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={chartData}>

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 const CACHE_KEY = 'fireApp_exchangeRates';
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 horas
 
-export const useExchangeRate = (language) => {
+export const useExchangeRate = () => {
     const [rates, setRates] = useState({ EUR: 1, USD: 1 });
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);

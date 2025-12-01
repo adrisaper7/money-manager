@@ -5,8 +5,6 @@ export const ConfigurationModal = ({
   onClose, 
   currency, 
   onCurrencyChange, 
-  language,
-  onLanguageChange,
   t 
 }) => {
   if (!isOpen) return null;
@@ -25,7 +23,7 @@ export const ConfigurationModal = ({
               {t('configuration.title')}
             </h2>
             <p className="text-xs text-slate-500 mt-1">
-              Ajusta el idioma de la interfaz y la moneda en la que se muestran tus datos.
+              Adjust the currency in which your data is displayed.
             </p>
           </div>
           <button
@@ -39,43 +37,11 @@ export const ConfigurationModal = ({
         </div>
 
         <div className="px-6 py-5 space-y-6">
-          {/* Language section */}
-          <section className="bg-slate-50 rounded-xl border border-slate-200 p-4">
-            <h3 className="text-sm font-semibold text-slate-800 mb-2">{t('configuration.language')}</h3>
-            <p className="text-xs text-slate-500 mb-3">
-              Selecciona el idioma en el que quieres ver la aplicación.
-            </p>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => onLanguageChange('es')}
-                className={`flex-1 px-3 py-2 rounded-lg border text-sm font-medium transition-all ${
-                  language === 'es'
-                    ? 'border-blue-500 bg-blue-50 text-blue-700'
-                    : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
-                }`}
-              >
-                Español
-              </button>
-              <button
-                type="button"
-                onClick={() => onLanguageChange('en')}
-                className={`flex-1 px-3 py-2 rounded-lg border text-sm font-medium transition-all ${
-                  language === 'en'
-                    ? 'border-blue-500 bg-blue-50 text-blue-700'
-                    : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
-                }`}
-              >
-                English
-              </button>
-            </div>
-          </section>
-
           {/* Currency section */}
           <section className="bg-slate-50 rounded-xl border border-slate-200 p-4">
             <h3 className="text-sm font-semibold text-slate-800 mb-2">{t('configuration.currency')}</h3>
             <p className="text-xs text-slate-500 mb-3">
-              Elige en qué moneda quieres ver los importes. Los datos base están en EUR.
+              Choose the currency you want to see amounts in. Base data is in EUR.
             </p>
             <div className="grid grid-cols-2 gap-3">
               {currencies.map((curr) => (

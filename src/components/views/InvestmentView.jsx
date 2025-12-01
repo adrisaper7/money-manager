@@ -7,7 +7,7 @@ import { AvailableFundsPanel } from '../AvailableFundsPanel';
 import { formatCurrency } from '../../utils';
 import { investmentCategories } from '../../constants';
 
-export const InvestmentView = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth, updateData, t, language, exchangeRates }) => {
+export const InvestmentView = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth, updateData, t, exchangeRates }) => {
     // Calculate net worth change (current month - previous month)
     const calculateNetWorthChange = () => {
         if (!data || data.length < 2) return 0;
@@ -42,12 +42,12 @@ export const InvestmentView = ({ data, stats, onAddPreviousMonth, onRemoveLastMo
                     <div className="flex gap-6">
                         <div className="text-right">
                             <p className="text-sm text-slate-500">{t('investments.totalInvested')}</p>
-                            <p className="text-2xl font-bold text-emerald-600">{formatCurrency(stats?.investmentAssets || 0, language, exchangeRates)}</p>
+                            <p className="text-2xl font-bold text-emerald-600">{formatCurrency(stats?.investmentAssets || 0, 'en', exchangeRates)}</p>
                         </div>
                         <div className="text-right border-l border-slate-300 pl-6">
                             <p className="text-sm text-slate-500">Cambio Neto (mes actual - anterior)</p>
                             <p className={`text-2xl font-bold ${isPositive ? 'text-emerald-600' : 'text-red-600'}`}>
-                                {isPositive ? '+' : ''}{formatCurrency(netWorthChange, language, exchangeRates)}
+                                {isPositive ? '+' : ''}{formatCurrency(netWorthChange, 'en', exchangeRates)}
                             </p>
                         </div>
                     </div>
@@ -72,13 +72,11 @@ export const InvestmentView = ({ data, stats, onAddPreviousMonth, onRemoveLastMo
                         categories={investmentCategories}
                         title={t('investments.investmentAssets')}
                         updateData={updateData}
-                        language={language}
                         exchangeRates={exchangeRates}
                     />
                     <DebtCollaborationTable
                         data={data}
                         updateData={updateData}
-                        language={language}
                         exchangeRates={exchangeRates}
                         t={t}
                     />

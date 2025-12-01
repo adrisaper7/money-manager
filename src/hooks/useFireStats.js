@@ -1,10 +1,8 @@
 import { useMemo } from 'react';
 import { getInvestmentCategoriesForLanguage } from '../constants';
-import { useLanguage } from './useLanguage';
 
 export const useFireStats = (data, config) => {
-    const { language } = useLanguage();
-    const investmentCategories = getInvestmentCategoriesForLanguage(language);
+    const investmentCategories = getInvestmentCategoriesForLanguage();
     const stats = useMemo(() => {
         if (data.length === 0) return null;
         const current = data[data.length - 1];
@@ -132,7 +130,7 @@ export const useFireStats = (data, config) => {
                 yearlySpend: yearlySpendDelta
             }
         };
-    }, [data, config, language, investmentCategories]);
+    }, [data, config, investmentCategories]);
 
     return stats;
 };
