@@ -1,7 +1,7 @@
 import React from 'react';
 import { Wallet, Target, Activity, TrendingUp } from 'lucide-react';
 import { KPICard } from '../KPICard';
-import { formatCurrency, formatPercent } from '../../utils';
+import { formatCurrency, formatPercent, formatNumberWithComma } from '../../utils';
 
 const buildTrend = (comparison, formatter, percentFormatter, label) => {
     if (!comparison) return null;
@@ -17,7 +17,7 @@ const buildTrend = (comparison, formatter, percentFormatter, label) => {
 };
 
 const formatPercentText = (value) => {
-    return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
+    return `${value >= 0 ? '+' : ''}${formatNumberWithComma(value, 1, 1)}%`;
 };
 
 export const KPIGrid = ({ stats, t, exchangeRates }) => {
@@ -42,7 +42,7 @@ export const KPIGrid = ({ stats, t, exchangeRates }) => {
             <KPICard
                 title="Target Net Worth"
                 value={formatCurrency(stats?.fiNumber || 0, 'en', exchangeRates)}
-                subtext={`${(stats?.progress || 0).toFixed(1)}% Completed`}
+                subtext={`${formatNumberWithComma(stats?.progress || 0, 1, 1)}% Completed`}
                 icon={Target}
                 color="indigo"
                 trend={buildTrend(
@@ -73,7 +73,7 @@ export const KPIGrid = ({ stats, t, exchangeRates }) => {
                 color="blue"
                 trend={buildTrend(
                     stats?.yearComparisons?.savingsRate,
-                    (value) => `${value >= 0 ? '+' : ''}${value.toFixed(1)} pts`,
+                    (value) => `${value >= 0 ? '+' : ''}${formatNumberWithComma(value, 1, 1)} pts`,
                     (value) => formatPercentText(value),
                     labelText
                 )}

@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { formatNumberWithComma } from '../../utils';
 
 export const ConfigInputs = ({
     config,
@@ -73,7 +74,7 @@ export const ConfigInputs = ({
                     disabled
                 />
                 <p className="text-xs text-slate-400 mt-1">
-                    Equivalent to {investmentRate}% of an average net income of {currencySymbol}{Math.round(averageNetIncome || 0).toLocaleString()} ({monthsUsed || 1} months).
+                    Equivalent to {investmentRate}% of an average net income of {currencySymbol}{formatNumberWithComma(averageNetIncome || 0)} ({monthsUsed || 1} months).
                 </p>
             </div>
             <div>
@@ -93,16 +94,16 @@ export const ConfigInputs = ({
                     <span className="text-xs uppercase tracking-wide text-blue-500 font-semibold">Estimation based on the last {monthsUsed || 1} months</span>
                     <div className="flex flex-wrap items-baseline gap-3">
                         <p className="text-sm text-slate-600">
-                            Average net income: <span className="font-semibold text-slate-800">{currencySymbol}{averageNetIncome ? Math.round(averageNetIncome).toLocaleString() : 0}</span>
+                            Average net income: <span className="font-semibold text-slate-800">{currencySymbol}{formatNumberWithComma(averageNetIncome || 0)}</span>
                         </p>
                         <p className="text-sm text-slate-600">
-                            Proposed investment ({latestInvestmentRate}%): <span className="font-semibold text-slate-800">{currencySymbol}{suggestedInvestment.toLocaleString()}</span>
+                            Proposed investment ({latestInvestmentRate}%): <span className="font-semibold text-slate-800">{currencySymbol}{formatNumberWithComma(suggestedInvestment)}</span>
                         </p>
                         <p className="text-sm text-slate-600">
                             Estimated annual savings rate: <span className="font-semibold text-slate-800">{(investmentRate || 0).toFixed(1)}%</span>
                         </p>
                         <p className="text-sm text-slate-600">
-                            Estimated annual net change: <span className="font-semibold text-slate-800">{currencySymbol}{annualNetChange.toLocaleString()}</span>
+                            Estimated annual net change: <span className="font-semibold text-slate-800">{currencySymbol}{formatNumberWithComma(annualNetChange)}</span>
                         </p>
                     </div>
                 </div>

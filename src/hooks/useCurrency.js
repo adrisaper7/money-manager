@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { formatNumberWithComma } from '../utils';
 
 export const useCurrency = () => {
     const [currency, setCurrency] = useState('EUR');
@@ -34,12 +35,7 @@ export const useCurrency = () => {
 
     const formatCurrency = (amount, currencyCode = currency) => {
         const symbol = getCurrencySymbol(currencyCode);
-        const formattedAmount = new Intl.NumberFormat('en-US', {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(Math.round(amount));
-        
-        return `${symbol}${formattedAmount}`;
+        return `${symbol}${formatNumberWithComma(amount)}`;
     };
 
     return {

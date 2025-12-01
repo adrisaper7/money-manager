@@ -1,8 +1,22 @@
-export const formatCurrency = (value, _language = 'en', _exchangeRates = null) => {
-    const locales = {
-        en: 'en-US'
-    };
+export const formatNumberWithComma = (value, minimumDecimals = 2, maximumDecimals = 2) => {
+    if (value === null || value === undefined || isNaN(value)) {
+        return '0,00';
+    }
+    
+    const number = Number(value);
+    const rounded = number.toFixed(maximumDecimals);
+    const [integerPart, decimalPart] = rounded.split('.');
+    
+    // Add thousands separator with dots
+    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    
+    // Ensure we have the required number of decimal places
+    const paddedDecimal = decimalPart.padEnd(maximumDecimals, '0').slice(0, maximumDecimals);
+    
+    return `${formattedInteger},${paddedDecimal}`;
+};
 
+export const formatCurrency = (value, _language = 'en', _exchangeRates = null) => {
     // Default currency (USD for English)
     let targetCurrency = 'USD';
 
@@ -25,24 +39,18 @@ export const formatCurrency = (value, _language = 'en', _exchangeRates = null) =
     //     displayValue = (value / (_exchangeRates.EUR || 1)) * (_exchangeRates.USD || 1.1);
     // }
 
-    return new Intl.NumberFormat(locales.en || 'en-US', {
-        style: 'currency',
-        currency: targetCurrency,
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-    }).format(displayValue);
+    const currencySymbol = targetCurrency === 'USD' ? '$' : '€';
+    return `${currencySymbol}${formatNumberWithComma(displayValue)}`;
 };
 
 export const formatPercent = (value, _language = 'en') => {
-    const locales = {
-        en: 'en-US'
-    };
-
-    return new Intl.NumberFormat(locales.en || 'en-US', {
-        style: 'percent',
-        minimumFractionDigits: 1,
-        maximumFractionDigits: 1,
-    }).format(value / 100);
+    if (value === null || value === undefined || isNaN(value)) {
+        return '0,0%';
+    }
+    
+    const number = Number(value);
+    const formattedValue = formatNumberWithComma(number, 1, 1);
+    return `${formattedValue}%`;
 };
 
 export const generateMonthId = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
