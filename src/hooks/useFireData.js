@@ -43,117 +43,110 @@ export const useFireData = (currentUserId) => {
             // Migrate each category type
             ['income', 'taxes', 'expenses', 'assets', 'liabilities'].forEach(type => {
                 const migratedValues = {};
+                const categoryMap = {
+                    'es_en': {
+                        'Banco': 'Bank',
+                        'Fondo Emergencia': 'Emergency Fund',
+                        'Cartera Inversión': 'Investment Portfolio',
+                        'Fondos Indexados': 'Index Funds',
+                        'Planes Pensiones': 'Pension Plans',
+                        'Inmobiliario': 'Real Estate',
+                        'Cripto': 'Crypto',
+                        'Hipoteca': 'Mortgage',
+                        'Préstamo Coche': 'Car Loan',
+                        'Tarjetas': 'Credit Cards',
+                        'Otros': 'Other',
+                        'Salario Bruto': 'Gross Salary',
+                        'Bonus': 'Bonus',
+                        'Dividendos': 'Dividends',
+                        'Negocio': 'Business',
+                        'IRPF': 'Income Tax',
+                        'Seguridad Social': 'Social Security',
+                        'Cuota Autónomos': 'Self-Employment Tax',
+                        'Vivienda': 'Housing',
+                        'Gas (Hogar)': 'Gas (Home)',
+                        'Electricidad': 'Electric',
+                        'Internet': 'Internet',
+                        'Seguros': 'Insurance',
+                        'Supermercado': 'Groceries',
+                        'Comer fuera': 'Eating Out',
+                        'Gasolina': 'Gas (Car)',
+                        'Transporte compartido': 'Rideshare',
+                        'Transporte público': 'Public Transit',
+                        'Peajes': 'Tolls',
+                        'Entretenimiento': 'Entertainment',
+                        'Ropa': 'Clothing',
+                        'Cuidado personal': 'Self Care',
+                        'Tintorería': 'Dry Cleaning',
+                        'Gimnasio': 'Gym',
+                        'Música': 'Music',
+                        'Educación': 'Education',
+                        'Médico': 'Medical',
+                        'Regalos': 'Gifts',
+                        'Donaciones': 'Charity',
+                        'Comisiones': 'Fees',
+                        'Varios': 'Misc'
+                    },
+                    'en_es': {
+                        'Bank': 'Banco',
+                        'Emergency Fund': 'Fondo Emergencia',
+                        'Investment Portfolio': 'Cartera Inversión',
+                        'Index Funds': 'Fondos Indexados',
+                        'Pension Plans': 'Planes Pensiones',
+                        'Real Estate': 'Inmobiliario',
+                        'Crypto': 'Cripto',
+                        'Mortgage': 'Hipoteca',
+                        'Car Loan': 'Préstamo Coche',
+                        'Credit Cards': 'Tarjetas',
+                        'Other': 'Otros',
+                        'Gross Salary': 'Salario Bruto',
+                        'Bonus': 'Bonus',
+                        'Dividends': 'Dividendos',
+                        'Business': 'Negocio',
+                        'Income Tax': 'IRPF',
+                        'Social Security': 'Seguridad Social',
+                        'Self-Employment Tax': 'Cuota Autónomos',
+                        'Housing': 'Vivienda',
+                        'Gas (Home)': 'Gas (Hogar)',
+                        'Electric': 'Electricidad',
+                        'Internet': 'Internet',
+                        'Insurance': 'Seguros',
+                        'Groceries': 'Supermercado',
+                        'Eating Out': 'Comer fuera',
+                        'Gas (Car)': 'Gasolina',
+                        'Rideshare': 'Transporte compartido',
+                        'Public Transit': 'Transporte público',
+                        'Tolls': 'Peajes',
+                        'Entertainment': 'Entretenimiento',
+                        'Clothing': 'Ropa',
+                        'Self Care': 'Cuidado personal',
+                        'Dry Cleaning': 'Tintorería',
+                        'Gym': 'Gimnasio',
+                        'Music': 'Música',
+                        'Education': 'Educación',
+                        'Medical': 'Médico',
+                        'Gifts': 'Regalos',
+                        'Charity': 'Donaciones',
+                        'Fees': 'Comisiones',
+                        'Misc': 'Varios'
+                    }
+                };
 
                 // Map old categories to new categories
                 toCategories[type].forEach(newCategory => {
-                    // Find corresponding category in old language (by position)
-                    const oldIndex = fromCategories[type].indexOf(newCategory);
-                    if (oldIndex !== -1) {
-                        // Same category name exists
-                        migratedValues[newCategory] = month[type][newCategory] || 0;
+                    // Look up the old category name in the source language
+                    const mapKey = `${fromLang}_${toLang}`;
+                    const oldCategoryName = categoryMap[mapKey]?.[newCategory];
+                    
+                    if (oldCategoryName && month[type]?.[oldCategoryName] !== undefined) {
+                        // Found the old category name, use its value
+                        migratedValues[newCategory] = month[type][oldCategoryName];
+                    } else if (month[type]?.[newCategory] !== undefined) {
+                        // Category name is the same in both languages
+                        migratedValues[newCategory] = month[type][newCategory];
                     } else {
-                        // Category doesn't exist, find by position or set to 0
-                        const categoryMap = {
-                            es: {
-                                en: {
-                                    'Banco': 'Bank',
-                                    'Fondo Emergencia': 'Emergency Fund',
-                                    'Cartera Inversión': 'Investment Portfolio',
-                                    'Fondos Indexados': 'Index Funds',
-                                    'Planes Pensiones': 'Pension Plans',
-                                    'Inmobiliario': 'Real Estate',
-                                    'Cripto': 'Crypto',
-                                    'Hipoteca': 'Mortgage',
-                                    'Préstamo Coche': 'Car Loan',
-                                    'Tarjetas': 'Credit Cards',
-                                    'Otros': 'Other',
-                                    'Salario Bruto': 'Gross Salary',
-                                    'Bonus': 'Bonus',
-                                    'Dividendos': 'Dividends',
-                                    'Negocio': 'Business',
-                                    'IRPF': 'Income Tax',
-                                    'Seguridad Social': 'Social Security',
-                                    'Cuota Autónomos': 'Self-Employment Tax',
-                                    'Vivienda': 'Housing',
-                                    'Gas (Hogar)': 'Gas (Home)',
-                                    'Electricidad': 'Electric',
-                                    'Internet': 'Internet',
-                                    'Seguros': 'Insurance',
-                                    'Supermercado': 'Groceries',
-                                    'Comer fuera': 'Eating Out',
-                                    'Gasolina': 'Gas (Car)',
-                                    'Transporte compartido': 'Rideshare',
-                                    'Transporte público': 'Public Transit',
-                                    'Peajes': 'Tolls',
-                                    'Entretenimiento': 'Entertainment',
-                                    'Ropa': 'Clothing',
-                                    'Cuidado personal': 'Self Care',
-                                    'Tintorería': 'Dry Cleaning',
-                                    'Gimnasio': 'Gym',
-                                    'Música': 'Music',
-                                    'Educación': 'Education',
-                                    'Médico': 'Medical',
-                                    'Regalos': 'Gifts',
-                                    'Donaciones': 'Charity',
-                                    'Comisiones': 'Fees',
-                                    'Varios': 'Misc'
-                                }
-                            },
-                            en: {
-                                es: {
-                                    'Bank': 'Banco',
-                                    'Emergency Fund': 'Fondo Emergencia',
-                                    'Investment Portfolio': 'Cartera Inversión',
-                                    'Index Funds': 'Fondos Indexados',
-                                    'Pension Plans': 'Planes Pensiones',
-                                    'Real Estate': 'Inmobiliario',
-                                    'Crypto': 'Cripto',
-                                    'Mortgage': 'Hipoteca',
-                                    'Car Loan': 'Préstamo Coche',
-                                    'Credit Cards': 'Tarjetas',
-                                    'Other': 'Otros',
-                                    'Gross Salary': 'Salario Bruto',
-                                    'Bonus': 'Bonus',
-                                    'Dividends': 'Dividendos',
-                                    'Business': 'Negocio',
-                                    'Income Tax': 'IRPF',
-                                    'Social Security': 'Seguridad Social',
-                                    'Self-Employment Tax': 'Cuota Autónomos',
-                                    'Housing': 'Vivienda',
-                                    'Gas (Home)': 'Gas (Hogar)',
-                                    'Electric': 'Electricidad',
-                                    'Internet': 'Internet',
-                                    'Insurance': 'Seguros',
-                                    'Groceries': 'Supermercado',
-                                    'Eating Out': 'Comer fuera',
-                                    'Gas (Car)': 'Gasolina',
-                                    'Rideshare': 'Transporte compartido',
-                                    'Public Transit': 'Transporte público',
-                                    'Tolls': 'Peajes',
-                                    'Entertainment': 'Entretenimiento',
-                                    'Clothing': 'Ropa',
-                                    'Self Care': 'Cuidado personal',
-                                    'Dry Cleaning': 'Tintorería',
-                                    'Gym': 'Gimnasio',
-                                    'Music': 'Música',
-                                    'Education': 'Educación',
-                                    'Medical': 'Médico',
-                                    'Gifts': 'Regalos',
-                                    'Charity': 'Donaciones',
-                                    'Fees': 'Comisiones',
-                                    'Misc': 'Varios'
-                                }
-                            }
-                        };
-
-                        // We are iterating over Target categories (newCategory).
-                        // We need to find the Source category name to look up the value in the old data.
-                        // The map is defined as Source -> Target (e.g. es -> en).
-                        // So we need to look up: What is the Source category that maps to this Target category?
-                        // Since our map is bidirectional (contains both es->en and en->es), we can use the reverse map:
-                        // categoryMap[toLang][fromLang][newCategory] gives us the Source category.
-                        const mappedCategory = categoryMap[toLang]?.[fromLang]?.[newCategory] || newCategory;
-                        migratedValues[newCategory] = month[type][mappedCategory] || 0;
+                        // Category not found, default to 0
+                        migratedValues[newCategory] = 0;
                     }
                 });
 
@@ -163,28 +156,32 @@ export const useFireData = (currentUserId) => {
             // Migrate debtCollaboration
             if (migratedMonth.debtCollaboration) {
                 const migratedDebtCollaboration = {};
-                toCategories.liabilities.forEach(newCategory => {
-                    const categoryMap = {
-                        es: {
-                            en: {
-                                'Hipoteca': 'Mortgage',
-                                'Préstamo Coche': 'Car Loan',
-                                'Tarjetas': 'Credit Cards',
-                                'Otros': 'Other'
-                            }
-                        },
-                        en: {
-                            es: {
-                                'Mortgage': 'Hipoteca',
-                                'Car Loan': 'Préstamo Coche',
-                                'Credit Cards': 'Tarjetas',
-                                'Other': 'Otros'
-                            }
-                        }
-                    };
+                const debtMap = {
+                    'es_en': {
+                        'Hipoteca': 'Mortgage',
+                        'Préstamo Coche': 'Car Loan',
+                        'Tarjetas': 'Credit Cards',
+                        'Otros': 'Other'
+                    },
+                    'en_es': {
+                        'Mortgage': 'Hipoteca',
+                        'Car Loan': 'Préstamo Coche',
+                        'Credit Cards': 'Tarjetas',
+                        'Other': 'Otros'
+                    }
+                };
 
-                    const mappedCategory = categoryMap[toLang]?.[fromLang]?.[newCategory] || newCategory;
-                    migratedDebtCollaboration[newCategory] = month.debtCollaboration[mappedCategory] || 0;
+                toCategories.liabilities.forEach(newCategory => {
+                    const mapKey = `${fromLang}_${toLang}`;
+                    const oldCategoryName = debtMap[mapKey]?.[newCategory];
+                    
+                    if (oldCategoryName && month.debtCollaboration?.[oldCategoryName] !== undefined) {
+                        migratedDebtCollaboration[newCategory] = month.debtCollaboration[oldCategoryName];
+                    } else if (month.debtCollaboration?.[newCategory] !== undefined) {
+                        migratedDebtCollaboration[newCategory] = month.debtCollaboration[newCategory];
+                    } else {
+                        migratedDebtCollaboration[newCategory] = 0;
+                    }
                 });
                 migratedMonth.debtCollaboration = migratedDebtCollaboration;
             }
