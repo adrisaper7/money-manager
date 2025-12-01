@@ -2,17 +2,17 @@ export const formatNumberWithComma = (value, minimumDecimals = 2, maximumDecimal
     if (value === null || value === undefined || isNaN(value)) {
         return '0,00';
     }
-    
+
     const number = Number(value);
     const rounded = number.toFixed(maximumDecimals);
     const [integerPart, decimalPart] = rounded.split('.');
-    
+
     // Add thousands separator with dots
     const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    
+
     // Ensure we have the required number of decimal places
     const paddedDecimal = decimalPart.padEnd(maximumDecimals, '0').slice(0, maximumDecimals);
-    
+
     return `${formattedInteger},${paddedDecimal}`;
 };
 
@@ -20,7 +20,7 @@ export const formatCurrency = (value, _language = 'en', _exchangeRates = null) =
     // Default currency (EUR)
     let targetCurrency = 'EUR';
 
-    // Si el usuario ha elegido una moneda en la configuración, usarla
+    // If the user has chosen a currency in the settings, use it
     try {
         if (typeof window !== 'undefined' && window.localStorage) {
             const savedCurrency = localStorage.getItem('fireApp_currency');
@@ -29,12 +29,12 @@ export const formatCurrency = (value, _language = 'en', _exchangeRates = null) =
             }
         }
     } catch (_error) {
-        // Ignorar errores de acceso a localStorage (modo incógnito, etc.)
+        // Ignore localStorage access errors (incognito mode, etc.)
     }
 
-    // No convertir el valor numérico, solo cambiar el símbolo de la moneda
+    // Do not convert the numeric value, only change the currency symbol
     let displayValue = value;
-    // La conversión de moneda ha sido deshabilitada intencionalmente
+    // Currency conversion has been intentionally disabled
     // if (_exchangeRates && targetCurrency === 'USD') {
     //     displayValue = (value / (_exchangeRates.EUR || 1)) * (_exchangeRates.USD || 1.1);
     // }
@@ -47,7 +47,7 @@ export const formatPercent = (value, _language = 'en') => {
     if (value === null || value === undefined || isNaN(value)) {
         return '0,0%';
     }
-    
+
     const number = Number(value);
     const formattedValue = formatNumberWithComma(number, 1, 1);
     return `${formattedValue}%`;
@@ -152,13 +152,13 @@ export const calculateCategoryAverages = (data = [], type, categories = [], mont
 
     // Use only the last specified number of months (default 6)
     const recentData = data.slice(-monthsWindow);
-    
+
     const averages = {};
-    
+
     categories.forEach(category => {
         const values = recentData.map(month => Number(month?.[type]?.[category] || 0));
         const validValues = values.filter(val => val > 0);
-        
+
         if (validValues.length > 0) {
             averages[category] = validValues.reduce((sum, val) => sum + val, 0) / validValues.length;
         } else {
@@ -169,7 +169,7 @@ export const calculateCategoryAverages = (data = [], type, categories = [], mont
     return averages;
 };
 
-export const downloadData = (data, filename = 'fire_dashboard_data_es.json') => {
+export const downloadData = (data, filename = 'money_manager_data.json') => {
     const jsonString = JSON.stringify(data);
     const blob = new Blob([jsonString], { type: "application/json" });
     const href = URL.createObjectURL(blob);
@@ -192,13 +192,13 @@ export const uploadData = (file, onSuccess, onError) => {
             if (onError) {
                 onError(error);
             } else {
-                alert('Error al cargar el archivo. Por favor, verifica que sea un archivo JSON válido.');
+                alert('Error loading file. Please verify it is a valid JSON file.');
             }
         }
     };
     fileReader.onerror = () => {
         if (onError) {
-            onError(new Error('Error al leer el archivo'));
+            onError(new Error('Error reading file'));
         }
     };
 };

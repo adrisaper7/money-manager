@@ -22,7 +22,7 @@ const formatPercentText = (value) => {
 
 export const KPIGrid = ({ stats, t, exchangeRates }) => {
     const baselineLabel = stats?.yearComparisons?.baselineLabel;
-    const labelText = baselineLabel ? baselineLabel : t('dashboard.startOfYear') || 'inicio de año';
+    const labelText = baselineLabel ? baselineLabel : t('dashboard.startOfYear') || 'Start of Year';
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

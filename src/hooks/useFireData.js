@@ -9,7 +9,7 @@ export const useFireData = (currentUserId) => {
     const [data, setData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const { isFirestoreAvailable, errorMessage } = useFirestoreStatus(currentUserId);
-    
+
     // Debouncing para evitar conflictos con Firebase
     const saveTimeoutRef = useRef(null);
     const pendingSaveRef = useRef(null);
@@ -26,7 +26,7 @@ export const useFireData = (currentUserId) => {
             const id = generateMonthId(d);
             initialData.push({
                 id,
-                monthLabel: d.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }),
+                monthLabel: d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
                 income: currentCategories.income.reduce((acc, curr) => ({ ...acc, [curr]: 0 }), {}),
                 taxes: currentCategories.taxes.reduce((acc, curr) => ({ ...acc, [curr]: 0 }), {}),
                 expenses: currentCategories.expenses.reduce((acc, curr) => ({ ...acc, [curr]: 0 }), {}),
@@ -111,7 +111,7 @@ export const useFireData = (currentUserId) => {
 
             const newEntry = {
                 id: currentMonthId,
-                monthLabel: newDate.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }),
+                monthLabel: newDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
                 income: currentCategories.income.reduce((acc, curr) => ({ ...acc, [curr]: 0 }), {}),
                 taxes: currentCategories.taxes.reduce((acc, curr) => ({ ...acc, [curr]: 0 }), {}),
                 expenses: currentCategories.expenses.reduce((acc, curr) => ({ ...acc, [curr]: 0 }), {}),
@@ -130,15 +130,15 @@ export const useFireData = (currentUserId) => {
     useEffect(() => {
         if (data.length > 0 && currentUserId) {
             console.log('☁️ Scheduling Firebase save for user:', currentUserId);
-            
+
             // Cancelar timeout anterior si existe
             if (saveTimeoutRef.current) {
                 clearTimeout(saveTimeoutRef.current);
             }
-            
+
             // Guardar referencia para el próximo save
             pendingSaveRef.current = data;
-            
+
             // Programar save con debounce (1 segundo)
             saveTimeoutRef.current = setTimeout(() => {
                 if (pendingSaveRef.current && isFirestoreAvailable === true) {
@@ -157,7 +157,7 @@ export const useFireData = (currentUserId) => {
                 pendingSaveRef.current = null;
             }, 1000); // 1 segundo de debounce
         }
-        
+
         // Cleanup
         return () => {
             if (saveTimeoutRef.current) {
@@ -227,7 +227,7 @@ export const useFireData = (currentUserId) => {
                     // Handle empty string as 0, ensure valid number
                     const rawValue = value === '' ? 0 : Number(value);
                     const newValue = isNaN(rawValue) ? 0 : rawValue;
-                    
+
                     updatedItem[type] = {
                         ...item[type],
                         [category]: newValue
@@ -251,7 +251,7 @@ export const useFireData = (currentUserId) => {
 
         const newEntry = {
             id: generateMonthId(prevDate),
-            monthLabel: prevDate.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }),
+            monthLabel: prevDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
             income: currentCategories.income.reduce((acc, curr) => ({ ...acc, [curr]: 0 }), {}),
             taxes: currentCategories.taxes.reduce((acc, curr) => ({ ...acc, [curr]: 0 }), {}),
             expenses: currentCategories.expenses.reduce((acc, curr) => ({ ...acc, [curr]: 0 }), {}),
@@ -266,13 +266,13 @@ export const useFireData = (currentUserId) => {
 
     const removeLastMonth = () => {
         if (!data || data.length <= 1) {
-            alert('No se puede eliminar. Debe quedar al menos un mes.');
+            alert('Cannot remove. At least one month must remain.');
             return;
         }
 
         const firstMonth = data[0];
-        const monthLabel = firstMonth?.monthLabel || 'Desconocido';
-        const message = `¿Estás seguro de que quieres eliminar el mes ${monthLabel}? (el más antiguo)`;
+        const monthLabel = firstMonth?.monthLabel || 'Unknown';
+        const message = `Are you sure you want to remove month ${monthLabel}? (the oldest one)`;
 
         if (window.confirm(message)) {
             const newData = data.slice(1);
@@ -296,4 +296,3 @@ export const useFireData = (currentUserId) => {
         errorMessage
     };
 };
-

@@ -81,7 +81,7 @@ export default function App() {
           <div className="flex">
             <div className="ml-3">
               <p className="text-sm text-yellow-700">
-                {errorMessage || 'Datos guardados localmente. Configure Firestore para sincronización en la nube.'}
+                {errorMessage || 'Data saved locally. Configure Firestore for cloud synchronization.'}
               </p>
             </div>
           </div>
