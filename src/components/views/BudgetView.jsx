@@ -3,10 +3,30 @@ import { MonthNavigationBar } from '../MonthNavigationBar';
 import { DataEntryTable } from '../DataEntryTable';
 import { MonthNavigationProvider } from '../../contexts/MonthNavigationContext';
 import { getCategoriesForLanguage } from '../../constants';
-import { formatPercent } from '../../utils';
+import { formatPercent, calculateCategoryAverages, formatCurrency } from '../../utils';
+import { useCurrency } from '../../hooks/useCurrency';
 
 export const BudgetView = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth, updateData, t, exchangeRates }) => {
     const categories = getCategoriesForLanguage();
+    const { currency } = useCurrency(); // Track currency changes
+    
+    // Calculate averages for each category type
+    const incomeAverages = calculateCategoryAverages(data, 'income', categories.income);
+    const taxesAverages = calculateCategoryAverages(data, 'taxes', categories.taxes);
+    const expensesAverages = calculateCategoryAverages(data, 'expenses', categories.expenses);
+    
+    // Create secondary column configuration for averages
+    const createAveragesColumn = (type, averages) => ({
+        header: 'Average',
+        getValue: (selectedMonth, category) => {
+            return averages[category] || 0;
+        },
+        formatValue: (value) => {
+            const formattedValue = formatCurrency(value, 'en', exchangeRates);
+            return `(${formattedValue})`;
+        },
+        editable: false
+    });
     
     return (
         <MonthNavigationProvider data={data}>
@@ -35,6 +55,8 @@ export const BudgetView = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth,
                         categories={categories.income}
                         updateData={updateData}
                         exchangeRates={exchangeRates}
+                        historicalData={data}
+                        secondaryColumn={createAveragesColumn('income', incomeAverages)}
                     />
                     <DataEntryTable
                         title={t('budget.taxes')}
@@ -42,6 +64,8 @@ export const BudgetView = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth,
                         categories={categories.taxes}
                         updateData={updateData}
                         exchangeRates={exchangeRates}
+                        historicalData={data}
+                        secondaryColumn={createAveragesColumn('taxes', taxesAverages)}
                     />
                     <DataEntryTable
                         title={t('budget.expenses')}
@@ -49,6 +73,8 @@ export const BudgetView = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth,
                         categories={categories.expenses}
                         updateData={updateData}
                         exchangeRates={exchangeRates}
+                        historicalData={data}
+                        secondaryColumn={createAveragesColumn('expenses', expensesAverages)}
                     />
                 </div>
             </div>

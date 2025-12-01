@@ -145,6 +145,27 @@ export const calculatePercentageBasedInvestment = ({ data = [], investmentRate =
     };
 };
 
+export const calculateCategoryAverages = (data = [], type, categories = []) => {
+    if (!Array.isArray(data) || data.length === 0 || !type || !categories.length) {
+        return {};
+    }
+
+    const averages = {};
+    
+    categories.forEach(category => {
+        const values = data.map(month => Number(month?.[type]?.[category] || 0));
+        const validValues = values.filter(val => val > 0);
+        
+        if (validValues.length > 0) {
+            averages[category] = validValues.reduce((sum, val) => sum + val, 0) / validValues.length;
+        } else {
+            averages[category] = 0;
+        }
+    });
+
+    return averages;
+};
+
 export const downloadData = (data, filename = 'fire_dashboard_data_es.json') => {
     const jsonString = JSON.stringify(data);
     const blob = new Blob([jsonString], { type: "application/json" });
