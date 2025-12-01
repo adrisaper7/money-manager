@@ -49,7 +49,23 @@ const BudgetContent = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth, upd
         return savings;
     };
 
+    // Calculate savings rate for selected month
+    const calculateSavingsRate = (month) => {
+        if (!month) return 0;
+        
+        const grossIncome = Object.values(month.income || {}).reduce((a, b) => a + Number(b || 0), 0);
+        const taxes = Object.values(month.taxes || {}).reduce((a, b) => a + Number(b || 0), 0);
+        const expenses = Object.values(month.expenses || {}).reduce((a, b) => a + Number(b || 0), 0);
+        const netIncome = grossIncome - taxes;
+        const savings = netIncome - expenses;
+        
+        // Savings rate = savings / net income * 100
+        if (netIncome <= 0) return 0;
+        return (savings / netIncome) * 100;
+    };
+
     const monthlyProfit = useMemo(() => calculateMonthlyProfit(selectedMonth), [selectedMonth]);
+    const monthlySavingsRate = useMemo(() => calculateSavingsRate(selectedMonth), [selectedMonth]);
     
     // Calculate yearly profit from last 12 months or available months
     const calculateYearlyProfit = () => {
@@ -101,7 +117,7 @@ const BudgetContent = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth, upd
                 <div className="flex gap-6">
                     <div className="text-right">
                         <p className="text-sm text-slate-500">{t('budget.savingsRate')}</p>
-                        <p className="text-2xl font-bold text-blue-600">{formatPercent(stats?.savingsRate || 0, 'en')}</p>
+                        <p className="text-2xl font-bold text-blue-600">{formatPercent(monthlySavingsRate, 'en')}</p>
                     </div>
                     <div className="text-right border-l border-slate-300 pl-6">
                         <p className="text-sm text-slate-500">Monthly Profit</p>
