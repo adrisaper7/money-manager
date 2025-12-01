@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 // Firebase configuration - works in both development and production
@@ -16,5 +16,14 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
+// Initialize Firebase Auth with persistence
 export const auth = getAuth(app);
+setPersistence(auth, browserLocalPersistence)
+    .then(() => {
+        console.log('✅ Firebase auth persistence enabled');
+    })
+    .catch((error) => {
+        console.error('❌ Error setting auth persistence:', error);
+    });
+
 export const db = getFirestore(app);

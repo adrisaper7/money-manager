@@ -15,6 +15,7 @@ import { useExchangeRate } from './hooks/useExchangeRate';
 import { useUserConfig } from './hooks/useUserConfig';
 import { downloadData, uploadData } from './utils';
 import { forceFirebaseMigration } from './utils/firebaseMigration';
+import './utils/authUtils'; // Import to make debugging functions available
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
