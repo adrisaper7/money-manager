@@ -10,7 +10,7 @@ export const useFireData = (currentUserId) => {
     const [data, setData] = useState([]);
     const { isFirestoreAvailable, errorMessage } = useFirestoreStatus(currentUserId);
     const { language } = useLanguage();
-    
+
     // Get categories for current language
     const currentCategories = useMemo(() => getCategoriesForLanguage(language), [language]);
 
@@ -18,14 +18,14 @@ export const useFireData = (currentUserId) => {
     const needsMigration = (data, fromLang, toLang) => {
         if (fromLang === toLang) return false;
         if (!data || data.length === 0) return false;
-        
+
         const fromCategories = getCategoriesForLanguage(fromLang);
         const toCategories = getCategoriesForLanguage(toLang);
-        
+
         // Check if first month has categories from the target language
         const firstMonth = data[0];
         if (!firstMonth || !firstMonth.assets) return false;
-        
+
         // Check if any asset category matches target language
         return !toCategories.assets.some(cat => firstMonth.assets.hasOwnProperty(cat));
     };
@@ -33,17 +33,17 @@ export const useFireData = (currentUserId) => {
     // Helper function to migrate data from Spanish to current language
     const migrateDataCategories = (data, fromLang = 'es', toLang = language) => {
         if (!needsMigration(data, fromLang, toLang)) return data;
-        
+
         const fromCategories = getCategoriesForLanguage(fromLang);
         const toCategories = getCategoriesForLanguage(toLang);
-        
+
         return data.map(month => {
             const migratedMonth = { ...month };
-            
+
             // Migrate each category type
             ['income', 'taxes', 'expenses', 'assets', 'liabilities'].forEach(type => {
                 const migratedValues = {};
-                
+
                 // Map old categories to new categories
                 toCategories[type].forEach(newCategory => {
                     // Find corresponding category in old language (by position)
@@ -117,15 +117,15 @@ export const useFireData = (currentUserId) => {
                                 }
                             }
                         };
-                        
+
                         const mappedCategory = categoryMap[fromLang]?.[toLang]?.[newCategory] || newCategory;
                         migratedValues[newCategory] = month[type][mappedCategory] || 0;
                     }
                 });
-                
+
                 migratedMonth[type] = migratedValues;
             });
-            
+
             // Migrate debtCollaboration
             if (migratedMonth.debtCollaboration) {
                 const migratedDebtCollaboration = {};
@@ -148,13 +148,13 @@ export const useFireData = (currentUserId) => {
                             }
                         }
                     };
-                    
+
                     const mappedCategory = categoryMap[fromLang]?.[toLang]?.[newCategory] || newCategory;
                     migratedDebtCollaboration[newCategory] = month.debtCollaboration[mappedCategory] || 0;
                 });
                 migratedMonth.debtCollaboration = migratedDebtCollaboration;
             }
-            
+
             return migratedMonth;
         });
     };
@@ -390,9 +390,17 @@ export const useFireData = (currentUserId) => {
                     };
                 }
 
-                // Auto-calculate Bank if we're updating investments or debt collaboration
+                // Auto-calculate Bank ONLY if we're NOT editing Bank directly
                 const bankCategory = language === 'es' ? 'Banco' : 'Bank';
-                if ((type === 'assets' && category !== bankCategory) || type === 'debtCollaboration' || type === 'income' || type === 'taxes' || type === 'expenses') {
+                // Auto-calculate Bank when editing: income, taxes, expenses, other assets, or debt collaboration
+                // But NOT when directly editing Bank itself
+                const shouldAutoCalculateBank = (type === 'assets' && category !== bankCategory) ||
+                    type === 'debtCollaboration' ||
+                    type === 'income' ||
+                    type === 'taxes' ||
+                    type === 'expenses';
+
+                if (shouldAutoCalculateBank) {
                     const grossIncome = Object.values(updatedItem.income || {}).reduce((a, b) => a + Number(b), 0);
                     const taxes = Object.values(updatedItem.taxes || {}).reduce((a, b) => a + Number(b), 0);
                     const expenses = Object.values(updatedItem.expenses || {}).reduce((a, b) => a + Number(b), 0);
@@ -415,6 +423,7 @@ export const useFireData = (currentUserId) => {
                         [bankCategory]: newBankValue
                     };
                 }
+                // If editing Bank directly, the value is already updated above in line 389
 
                 return updatedItem;
             }
@@ -422,7 +431,7 @@ export const useFireData = (currentUserId) => {
         }));
     };
 
-    
+
     const addPreviousMonth = () => {
         if (data.length === 0) return;
 
