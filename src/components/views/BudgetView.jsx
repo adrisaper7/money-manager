@@ -57,6 +57,7 @@ export const BudgetView = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth,
                         exchangeRates={exchangeRates}
                         historicalData={data}
                         secondaryColumn={createAveragesColumn('income', incomeAverages)}
+                        showTrendIcon={true}
                     />
                     <DataEntryTable
                         title={t('budget.taxes')}
@@ -66,6 +67,7 @@ export const BudgetView = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth,
                         exchangeRates={exchangeRates}
                         historicalData={data}
                         secondaryColumn={createAveragesColumn('taxes', taxesAverages)}
+                        showTrendIcon={true}
                     />
                     <DataEntryTable
                         title={t('budget.expenses')}
@@ -75,6 +77,7 @@ export const BudgetView = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth,
                         exchangeRates={exchangeRates}
                         historicalData={data}
                         secondaryColumn={createAveragesColumn('expenses', expensesAverages)}
+                        showTrendIcon={true}
                     />
                 </div>
             </div>
