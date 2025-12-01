@@ -12,16 +12,17 @@ import { useUser } from './hooks/useUser';
 import { useLanguage } from './hooks/useLanguage';
 import { useCurrency } from './hooks/useCurrency';
 import { useExchangeRate } from './hooks/useExchangeRate';
+import { useUserConfig } from './hooks/useUserConfig';
 import { downloadData, uploadData } from './utils';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [config, setConfig] = useState(initialConfig);
 
   const { currentUser, isLoading: userLoading, loginUser, registerUser, logoutUser } = useUser();
   const { language, t } = useLanguage();
   const { currency, isLoading: currencyLoading, changeCurrency } = useCurrency();
   const { rates: exchangeRates, isLoading: ratesLoading } = useExchangeRate();
+  const { config, isLoading: configLoading, updateConfig } = useUserConfig(currentUser?.id);
   const { data, updateData, addPreviousMonth, removeLastMonth, loadData, isFirestoreAvailable, errorMessage } = useFireData(currentUser?.id);
   const stats = useFireStats(data, config);
 
@@ -35,7 +36,7 @@ export default function App() {
     }
   };
 
-  if (userLoading || currencyLoading) {
+  if (userLoading || currencyLoading || configLoading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-slate-600">{t('app.loading')}</div>
@@ -120,7 +121,7 @@ export default function App() {
         )}
 
         {activeTab === 'settings' && (
-          <SettingsView config={config} setConfig={setConfig} stats={stats} t={t} exchangeRates={exchangeRates} data={data} />
+          <SettingsView config={config} setConfig={updateConfig} stats={stats} t={t} exchangeRates={exchangeRates} data={data} />
         )}
       </main>
     </div>
