@@ -388,15 +388,57 @@ export const useFireData = (currentUserId) => {
                     });
             }
         }
-        // Also keep localStorage as backup
+        // Also keep localStorage as backup and notify other tabs
         if (data.length > 0) {
             const storageKey = currentUserId ? `fireData_${currentUserId}_v1` : 'fireData_es_v1';
-            localStorage.setItem(storageKey, JSON.stringify(data));
-            console.log('Data saved to localStorage:', storageKey);
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(data));
+                // Write a companion timestamp key to reliably notify other tabs of an update
+                localStorage.setItem(`${storageKey}_updatedAt`, String(Date.now()));
+                console.log('Data saved to localStorage:', storageKey);
+            } catch (err) {
+                console.error('Error saving to localStorage:', err);
+            }
         }
     }, [data, currentUserId, getUserDocRef]);
 
+    // Sync across multiple open tabs/windows using the storage event.
+    useEffect(() => {
+        const handleStorage = (event) => {
+            if (!event.key) return;
+
+            // Determine the storageKey for this context (user or anonymous)
+            const expectedPrefix = currentUserId ? `fireData_${currentUserId}_v1` : 'fireData_es_v1';
+
+            // If the relevant data key or the companion updatedAt key changed, reload from storage
+            if (event.key === expectedPrefix || event.key === `${expectedPrefix}_updatedAt`) {
+                try {
+                    const raw = localStorage.getItem(expectedPrefix);
+                    if (!raw) return;
+                    const parsed = JSON.parse(raw);
+
+                    // Simple check to avoid unnecessary setState calls
+                    const currentString = JSON.stringify(data || []);
+                    const incomingString = JSON.stringify(parsed || []);
+                    if (currentString !== incomingString) {
+                        console.log('Detected external localStorage update, syncing data from storage');
+                        setData(parsed.map(month => ({
+                            ...month,
+                            debtCollaboration: month.debtCollaboration || currentCategories.liabilities.reduce((acc, curr) => ({ ...acc, [curr]: 0 }), {})
+                        })));
+                    }
+                } catch (err) {
+                    console.error('Failed to parse localStorage data during sync:', err);
+                }
+            }
+        };
+
+        window.addEventListener('storage', handleStorage);
+        return () => window.removeEventListener('storage', handleStorage);
+    }, [currentUserId, data, currentCategories.liabilities]);
+
     const updateData = (monthId, type, category, value) => {
+        console.log('updateData called:', { monthId, type, category, value });
         setData(prev => prev.map(item => {
             if (item.id === monthId) {
                 let updatedItem = { ...item };
@@ -459,6 +501,7 @@ export const useFireData = (currentUserId) => {
                 }
                 // If editing Bank directly, the value is already updated above in line 389
 
+                console.log('updatedItem for month', monthId, updatedItem);
                 return updatedItem;
             }
             return item;
