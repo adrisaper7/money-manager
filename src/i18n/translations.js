@@ -37,15 +37,21 @@ export const translations = {
     },
     networth: {
       title: 'Net Worth',
-      subtitle: 'Track your assets and liabilities.',
+      subtitle: 'Track your assets and debts.',
       totalNetWorth: 'Total Net Worth',
       assets: 'Assets',
-      liabilities: 'Liabilities',
+      assetsSubtitle: 'What you own',
+      liabilities: 'Debts',
+      liabilitiesSubtitle: 'Money you owe',
       netChange: 'Net Change (current - previous)',
       annualChange: 'Net Change (last 12 months)',
       paid: 'Paid',
+      paidDown: 'Paid down',
       assetEvolution: 'Asset Evolution',
-      liabilityEvolution: 'Liability Evolution'
+      liabilityEvolution: 'Debt Reduction',
+      totalDebt: 'Total Debt',
+      debtToAssetRatio: 'Debt-to-Asset Ratio',
+      debtReduction: 'Debt Reduction This Month'
     },
     investments: {
       title: 'Investment Assets',

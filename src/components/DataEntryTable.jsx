@@ -9,6 +9,7 @@ export const DataEntryTable = ({
     type,
     categories,
     title,
+    subtitle,
     updateData,
     language,
     exchangeRates,
@@ -76,7 +77,7 @@ export const DataEntryTable = ({
     if (!selectedMonth) {
         return (
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden p-8 text-center">
-                <p className="text-slate-500">No hay datos para mostrar.</p>
+                <p className="text-slate-500">No data to display.</p>
             </div>
         );
     }
@@ -85,6 +86,7 @@ export const DataEntryTable = ({
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="p-4 border-b border-slate-200 bg-slate-50">
                 <h3 className="font-bold text-slate-700">{title}</h3>
+                {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
             </div>
 
             <div className="overflow-x-auto">

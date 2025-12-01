@@ -8,7 +8,7 @@ export const initialConfig = {
 
 export const categories = {
     assets: ['Bank', 'Emergency Fund', 'Investment Portfolio', 'Index Funds', 'Pension Plans', 'Real Estate', 'Crypto'],
-    liabilities: ['Mortgage', 'Car Loan', 'Credit Cards', 'Other'],
+    liabilities: ['Home Mortgage', 'Auto Loan', 'Student Loans', 'Credit Card Debt', 'Personal Loans', 'Other Debt'],
     income: ['Gross Salary', 'Bonus', 'Dividends', 'Business', 'Other'],
     taxes: ['Income Tax', 'Social Security', 'Self-Employment Tax'],
     expenses: [

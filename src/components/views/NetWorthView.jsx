@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { MonthNavigationBar } from '../MonthNavigationBar';
 import { DataEntryTable } from '../DataEntryTable';
+import { DebtTable } from '../DebtTable';
 import { AssetLiabilityChart } from '../charts/AssetLiabilityChart';
 import { MonthNavigationProvider, useMonthNavigation } from '../../contexts/MonthNavigationContext';
 import { getCategoriesForLanguage } from '../../constants';
@@ -91,6 +92,7 @@ const NetWorthContent = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth, u
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <DataEntryTable
                     title={t('networth.assets')}
+                    subtitle={t('networth.assetsSubtitle')}
                     type="assets"
                     categories={categories.assets}
                     updateData={updateData}
@@ -98,14 +100,17 @@ const NetWorthContent = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth, u
                     historicalData={data}
                     showTrendIcon
                 />
-                <DataEntryTable
+                <DebtTable
                     title={t('networth.liabilities')}
+                    subtitle={t('networth.liabilitiesSubtitle')}
                     type="liabilities"
                     categories={categories.liabilities}
                     updateData={updateData}
                     exchangeRates={exchangeRates}
                     historicalData={data}
                     showTrendIcon
+                    selectedMonthIndex={selectedMonthIndex}
+                    t={t}
                     secondaryColumn={{
                         header: t('networth.paid'),
                         getValue: (month, category) => month?.debtCollaboration?.[category] || 0,
