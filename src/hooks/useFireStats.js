@@ -79,7 +79,28 @@ export const useFireStats = (data, config) => {
 
         const netIncome = grossIncome - totalTaxes;
         const savings = netIncome - totalExpenses;
-        const savingsRate = netIncome > 0 ? (savings / netIncome) * 100 : 0;
+
+
+        // Calculate median savings rate for the current year
+        const currentYearMonths = data.filter(month => month.id.startsWith(`${currentYear}-`));
+        const yearlySavingsRates = currentYearMonths.map(month => {
+            const mGrossIncome = sumValues(month.income);
+            const mTaxes = sumValues(month.taxes);
+            const mExpenses = sumValues(month.expenses);
+            const mNetIncome = mGrossIncome - mTaxes;
+            const mSavings = mNetIncome - mExpenses;
+            return mNetIncome > 0 ? (mSavings / mNetIncome) * 100 : 0;
+        }).sort((a, b) => a - b);
+
+        let savingsRate = 0;
+        if (yearlySavingsRates.length > 0) {
+            const mid = Math.floor(yearlySavingsRates.length / 2);
+            if (yearlySavingsRates.length % 2 !== 0) {
+                savingsRate = yearlySavingsRates[mid];
+            } else {
+                savingsRate = (yearlySavingsRates[mid - 1] + yearlySavingsRates[mid]) / 2;
+            }
+        }
 
         // Yearly Average Spend (Last 12 months or available)
         const monthsToAvg = Math.min(data.length, 12);
@@ -100,7 +121,7 @@ export const useFireStats = (data, config) => {
         const targetYear = config.targetYear || currentYear + 10;
         const yearsRemaining = Math.max(0, targetYear - currentYear);
         const expectedReturn = (config.expectedReturn || 7.0) / 100;
-        
+
         // Optimización para evitar problemas con números grandes
         let coastFiNumber = targetInvestment;
         if (yearsRemaining > 0 && expectedReturn > 0 && targetInvestment > 0) {
@@ -108,7 +129,7 @@ export const useFireStats = (data, config) => {
                 // Limitar el cálculo para evitar overflow
                 const maxSafeInvestment = 1e15; // 1 quadrillion
                 const safeInvestment = Math.min(targetInvestment, maxSafeInvestment);
-                
+
                 // Usar cálculo más seguro para números grandes
                 if (yearsRemaining <= 50 && safeInvestment < 1e12) {
                     coastFiNumber = safeInvestment / Math.pow(1 + expectedReturn, yearsRemaining);
