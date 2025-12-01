@@ -8,6 +8,11 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <!-- Redirect to the actual app at /money-manager/ -->
+    <script>
+      if (!window.location.pathname.includes('/money-manager/')) {
+        window.location.href = '/money-manager/';
+      }
+    </script>
   </body>
 </html>
