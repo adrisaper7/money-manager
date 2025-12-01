@@ -483,11 +483,10 @@ export const useFireData = (currentUserId) => {
                     const netIncome = grossIncome - taxes;
                     const availableFunds = netIncome - expenses;
 
-                    // Money assigned to investments (except Bank)
-                    const otherInvestments = Object.entries(updatedItem.assets || {}).reduce((acc, [key, val]) => {
-                        if (key !== bankCategory) return acc + Number(val || 0);
-                        return acc;
-                    }, 0);
+                    // Money assigned to investments (except Bank) - exclude Bank from the sum
+                    const otherInvestments = Object.entries(updatedItem.assets || {})
+                        .filter(([key]) => key !== bankCategory)
+                        .reduce((acc, [, val]) => acc + Number(val || 0), 0);
 
                     const assignedToDebt = Object.values(updatedItem.debtCollaboration || {}).reduce((a, b) => a + Number(b), 0);
                     const totalOtherAssignments = otherInvestments + assignedToDebt;
