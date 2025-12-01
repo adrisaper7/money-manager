@@ -17,14 +17,14 @@ export const formatNumberWithComma = (value, minimumDecimals = 2, maximumDecimal
 };
 
 export const formatCurrency = (value, _language = 'en', _exchangeRates = null) => {
-    // Default currency (USD for English)
-    let targetCurrency = 'USD';
+    // Default currency (EUR)
+    let targetCurrency = 'EUR';
 
     // Si el usuario ha elegido una moneda en la configuración, usarla
     try {
         if (typeof window !== 'undefined' && window.localStorage) {
             const savedCurrency = localStorage.getItem('fireApp_currency');
-            if (savedCurrency === 'USD') {
+            if (savedCurrency && (savedCurrency === 'EUR' || savedCurrency === 'USD')) {
                 targetCurrency = savedCurrency;
             }
         }
