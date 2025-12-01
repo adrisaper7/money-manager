@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://adrisaper7.github.io/money-manager",
+  "homepage": "https://adrisaper7.github.io/fire-dashboard",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
