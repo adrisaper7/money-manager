@@ -26,8 +26,18 @@ export const ConfigInputs = ({
                 <label className="block text-sm font-medium text-slate-700 mb-1">Investment Target ({currencySymbol})</label>
                 <input
                     type="number"
-                    value={config.targetInvestment || ''}
-                    onChange={(e) => setConfig({ ...config, targetInvestment: Number(e.target.value) })}
+                    value={config.targetInvestment ?? ''}
+                    onChange={(e) => {
+                        const value = e.target.value;
+                        const numValue = Number(value);
+                        // Validar para evitar números muy grandes (hasta 1 billón)
+                        if (value === '' || (numValue >= 0 && numValue <= 999999999999)) {
+                            setConfig({ ...config, targetInvestment: Number(e.target.value) });
+                        } else {
+                            console.warn('Número demasiado grande para inversión:', value);
+                            e.target.value = config.targetInvestment ?? '';
+                        }
+                    }}
                     className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="1000000"
                 />
@@ -37,8 +47,18 @@ export const ConfigInputs = ({
                 <label className="block text-sm font-medium text-slate-700 mb-1">Target Year</label>
                 <input
                     type="number"
-                    value={config.targetYear || ''}
-                    onChange={(e) => setConfig({ ...config, targetYear: Number(e.target.value) })}
+                    value={config.targetYear ?? ''}
+                    onChange={(e) => {
+                        const value = e.target.value;
+                        const numValue = Number(value);
+                        // Validar año razonable (1900-2100)
+                        if (value === '' || (numValue >= 1900 && numValue <= 2100)) {
+                            setConfig({ ...config, targetYear: Number(e.target.value) });
+                        } else {
+                            console.warn('Año fuera de rango:', value);
+                            e.target.value = config.targetYear ?? '';
+                        }
+                    }}
                     className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder={currentYear + 10}
                     min={currentYear}
@@ -82,8 +102,18 @@ export const ConfigInputs = ({
                 <input
                     type="number"
                     step="0.1"
-                    value={config.expectedReturn || ''}
-                    onChange={(e) => setConfig({ ...config, expectedReturn: Number(e.target.value) })}
+                    value={config.expectedReturn ?? ''}
+                    onChange={(e) => {
+                        const value = e.target.value;
+                        const numValue = Number(value);
+                        // Validar retorno razonable (-50% a 100%)
+                        if (value === '' || (numValue >= -50 && numValue <= 100)) {
+                            setConfig({ ...config, expectedReturn: Number(e.target.value) });
+                        } else {
+                            console.warn('Retorno esperado fuera de rango:', value);
+                            e.target.value = config.expectedReturn ?? '';
+                        }
+                    }}
                     className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="7.0"
                 />

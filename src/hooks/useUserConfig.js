@@ -128,45 +128,19 @@ export const useUserConfig = (currentUserId) => {
     // Save config to Firestore on change
     useEffect(() => {
         if (!isLoading && currentUserId) {
-            console.log('🔧 Saving config to Firestore for user:', currentUserId);
-            console.log('🔧 Config to save:', config);
+            console.log('☁️ Saving config to Firebase only for user:', currentUserId);
+            console.log('☁️ Config to save:', config);
             const userDocRef = getUserDocRef();
             if (userDocRef && isFirestoreAvailable === true) {
-                // Save to Firestore
+                // Save to Firestore only
                 setDoc(userDocRef, { config }, { merge: true })
-                    .then(() => {
-                        console.log('✅ Config saved successfully to Firestore');
-                        // Also save to localStorage as backup
-                        const storageKey = `fireConfig_${currentUserId}_v1`;
-                        try {
-                            localStorage.setItem(storageKey, JSON.stringify(config));
-                            console.log('✅ Config saved to localStorage as backup');
-                        } catch (err) {
-                            console.error('❌ Error saving config to localStorage:', err);
-                        }
-                    })
+                    .then(() => console.log('☁️ Config saved successfully to Firebase'))
                     .catch(error => {
-                        console.error('❌ Error saving config to Firestore:', error);
-                        console.log('🔄 Falling back to localStorage only');
-                        // Fallback to localStorage
-                        const storageKey = `fireConfig_${currentUserId}_v1`;
-                        try {
-                            localStorage.setItem(storageKey, JSON.stringify(config));
-                            console.log('✅ Config saved to localStorage:', storageKey);
-                        } catch (err) {
-                            console.error('❌ Error saving config to localStorage:', err);
-                        }
+                        console.error('❌ Error saving config to Firebase:', error);
+                        console.log('⚠️ Config not saved - Firebase unavailable');
                     });
             } else {
-                console.log('📱 Firestore not available, saving to localStorage only');
-                // Save to localStorage as backup
-                const storageKey = currentUserId ? `fireConfig_${currentUserId}_v1` : 'fireConfig_es_v1';
-                try {
-                    localStorage.setItem(storageKey, JSON.stringify(config));
-                    console.log('✅ Config saved to localStorage:', storageKey);
-                } catch (err) {
-                    console.error('❌ Error saving config to localStorage:', err);
-                }
+                console.log('⚠️ Firebase not available - config not saved');
             }
         } else {
             console.log('⏸️ Not saving config - loading:', isLoading, 'userId:', currentUserId);
@@ -176,17 +150,6 @@ export const useUserConfig = (currentUserId) => {
     const updateConfig = (newConfig) => {
         console.log('🔄 Updating config:', newConfig);
         setConfig(newConfig);
-        
-        // Force immediate save for mobile compatibility
-        if (currentUserId) {
-            const storageKey = `fireConfig_${currentUserId}_v1`;
-            try {
-                localStorage.setItem(storageKey, JSON.stringify(newConfig));
-                console.log('💾 Config immediately saved to localStorage');
-            } catch (err) {
-                console.error('❌ Error immediately saving config to localStorage:', err);
-            }
-        }
     };
 
     return {

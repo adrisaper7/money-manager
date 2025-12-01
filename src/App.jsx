@@ -14,9 +14,17 @@ import { useCurrency } from './hooks/useCurrency';
 import { useExchangeRate } from './hooks/useExchangeRate';
 import { useUserConfig } from './hooks/useUserConfig';
 import { downloadData, uploadData } from './utils';
+import { forceFirebaseMigration } from './utils/firebaseMigration';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
+
+  // Make migration tools available globally for console access
+  React.useEffect(() => {
+    window.forceFirebaseMigration = forceFirebaseMigration;
+    console.log('🔧 Migration tools available:');
+    console.log('  - forceFirebaseMigration() - Migrate Firebase data to localStorage');
+  }, []);
 
   const { currentUser, isLoading: userLoading, loginUser, registerUser, logoutUser } = useUser();
   const { language, t } = useLanguage();

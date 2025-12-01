@@ -10,7 +10,19 @@ export const useFireStats = (data, config) => {
         const previousYear = currentYear - 1;
 
         // Net Worth
-        const sumValues = (obj = {}) => Object.values(obj).reduce((a, b) => a + Number(b || 0), 0);
+        const sumValues = (obj = {}) => {
+            let total = 0;
+            for (const value of Object.values(obj)) {
+                const num = Number(value || 0);
+                // Validación para evitar overflow
+                if (!isNaN(num) && isFinite(num) && Math.abs(num) < 1e15) {
+                    total += num;
+                } else if (num !== 0) {
+                    console.warn('Valor numérico inválido o muy grande:', value);
+                }
+            }
+            return total;
+        };
         const calcMonthTotals = (month) => {
             if (!month) {
                 return {
@@ -50,26 +62,33 @@ export const useFireStats = (data, config) => {
         const netWorth = totalAssets + debtCollaborationTotal - totalLiabilities;
 
         // Activos considerados como objetivos de inversión (filtrar por categorías)
-        const investmentAssetsTotal = Object.entries(current.assets || {}).reduce((acc, [key, val]) => {
-            if (investmentCategories.includes(key)) return acc + Number(val || 0);
-            return acc;
-        }, 0);
+        let investmentAssetsTotal = 0;
+        for (const [key, val] of Object.entries(current.assets || {})) {
+            if (investmentCategories.includes(key)) {
+                const num = Number(val || 0);
+                if (!isNaN(num) && isFinite(num) && Math.abs(num) < 1e15) {
+                    investmentAssetsTotal += num;
+                }
+            }
+        }
 
         // Cash Flow (Last Month)
-        const grossIncome = Object.values(current.income || {}).reduce((a, b) => a + Number(b), 0);
-        const totalTaxes = Object.values(current.taxes || {}).reduce((a, b) => a + Number(b), 0);
-        const totalExpenses = Object.values(current.expenses || {}).reduce((a, b) => a + Number(b), 0);
+        const grossIncome = sumValues(current.income);
+        const totalTaxes = sumValues(current.taxes);
+        const totalExpenses = sumValues(current.expenses);
 
         const netIncome = grossIncome - totalTaxes;
         const savings = netIncome - totalExpenses;
         const savingsRate = netIncome > 0 ? (savings / netIncome) * 100 : 0;
 
-        // Yearly Average Spend (Last 6 months or available)
+        // Yearly Average Spend (Last 12 months or available)
         const monthsToAvg = Math.min(data.length, 12);
         const recentData = data.slice(-monthsToAvg);
-        const avgMonthlySpend = recentData.reduce((acc, month) => {
-            return acc + Object.values(month.expenses || {}).reduce((a, b) => a + Number(b), 0);
-        }, 0) / monthsToAvg;
+        let totalMonthlySpend = 0;
+        for (const month of recentData) {
+            totalMonthlySpend += sumValues(month.expenses);
+        }
+        const avgMonthlySpend = totalMonthlySpend / monthsToAvg;
         const yearlySpend = avgMonthlySpend * 12;
 
         // Objetivo de Inversión (usar campo de configuración específico)
@@ -81,9 +100,27 @@ export const useFireStats = (data, config) => {
         const targetYear = config.targetYear || currentYear + 10;
         const yearsRemaining = Math.max(0, targetYear - currentYear);
         const expectedReturn = (config.expectedReturn || 7.0) / 100;
-        const coastFiNumber = yearsRemaining > 0 && expectedReturn > 0
-            ? targetInvestment / Math.pow(1 + expectedReturn, yearsRemaining)
-            : targetInvestment;
+        
+        // Optimización para evitar problemas con números grandes
+        let coastFiNumber = targetInvestment;
+        if (yearsRemaining > 0 && expectedReturn > 0 && targetInvestment > 0) {
+            try {
+                // Limitar el cálculo para evitar overflow
+                const maxSafeInvestment = 1e15; // 1 quadrillion
+                const safeInvestment = Math.min(targetInvestment, maxSafeInvestment);
+                
+                // Usar cálculo más seguro para números grandes
+                if (yearsRemaining <= 50 && safeInvestment < 1e12) {
+                    coastFiNumber = safeInvestment / Math.pow(1 + expectedReturn, yearsRemaining);
+                } else {
+                    // Para números muy grandes o muchos años, usar aproximación
+                    coastFiNumber = safeInvestment * Math.exp(-yearsRemaining * Math.log(1 + expectedReturn));
+                }
+            } catch (error) {
+                console.warn('Error en cálculo Coast FI, usando valor seguro:', error);
+                coastFiNumber = targetInvestment;
+            }
+        }
 
         const firstMonthOfYear = data.find(month => month.id.startsWith(`${currentYear}-`)) || data[0];
         const previousYearMonths = data.filter(month => month.id.startsWith(`${previousYear}-`));

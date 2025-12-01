@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { generateMonthId } from '../utils';
 import { defaultCategories, getCategoriesForLanguage } from '../constants';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
@@ -7,7 +7,12 @@ import { useFirestoreStatus } from './useFirestoreStatus';
 
 export const useFireData = (currentUserId) => {
     const [data, setData] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
     const { isFirestoreAvailable, errorMessage } = useFirestoreStatus(currentUserId);
+    
+    // Debouncing para evitar conflictos con Firebase
+    const saveTimeoutRef = useRef(null);
+    const pendingSaveRef = useRef(null);
 
     // Get categories
     const currentCategories = useMemo(() => getCategoriesForLanguage(), []);
@@ -40,107 +45,56 @@ export const useFireData = (currentUserId) => {
         return doc(db, 'users', currentUserId, 'financialData', 'main');
     };
 
-    // Initialize data from Firestore or localStorage as fallback
+    // Load data on component mount and user changes
     useEffect(() => {
         if (!currentUserId) {
-            // Fallback to localStorage if no user
-            const storageKey = 'fireData_es_v1';
-            const savedData = localStorage.getItem(storageKey);
-            if (savedData) {
-                setData(JSON.parse(savedData));
-            } else {
-                console.log('No user and no data, creating initial dataset...');
-                const initialData = generateInitialData();
-                setData(initialData);
-            }
+            console.log('⚠️ No user ID provided, no data loaded');
             return;
         }
 
-        // If Firestore is not available, use localStorage only
-        if (isFirestoreAvailable === false) {
-            console.log('Firestore not available, using localStorage only');
-            const storageKey = `fireData_${currentUserId}_v1`;
-            const savedData = localStorage.getItem(storageKey);
-            if (savedData) {
-                setData(JSON.parse(savedData));
-                let parsedData = JSON.parse(savedData);
-                parsedData = parsedData.map(month => ({
-                    ...month,
-                    debtCollaboration: month.debtCollaboration || currentCategories.liabilities.reduce((acc, curr) => ({ ...acc, [curr]: 0 }), {})
-                }));
-                setData(parsedData);
-            } else {
-                console.log('No data in localStorage, creating initial dataset...');
-                const initialData = generateInitialData();
-                setData(initialData);
-            }
-            return;
-        }
+        setIsLoading(true);
+        console.log('🔄 Loading data from Firebase only for user:', currentUserId);
 
-        // If Firestore is checking or available, try to use it
-        if (isFirestoreAvailable === null || isFirestoreAvailable === true) {
+        // Only use Firebase (cloud storage)
+        if (isFirestoreAvailable === true) {
             const userDocRef = getUserDocRef();
-            if (!userDocRef) return;
+            if (!userDocRef) {
+                console.log('❌ No user document reference available');
+                setIsLoading(false);
+                return;
+            }
 
-            // Try to load from Firestore first
-            console.log('Loading data from Firestore for user:', currentUserId);
+            console.log('☁️ Loading data from Firebase cloud for user:', currentUserId);
             const unsubscribe = onSnapshot(userDocRef, (docSnapshot) => {
-                console.log('Firestore snapshot received:', docSnapshot.exists());
+                console.log('☁️ Firebase snapshot received:', docSnapshot.exists());
                 if (docSnapshot.exists()) {
                     const firestoreData = docSnapshot.data().data || [];
-                    console.log('Data loaded from Firestore:', firestoreData);
+                    console.log('✅ Data loaded from Firebase:', firestoreData.length, 'months');
                     setData(firestoreData);
                 } else {
-                    console.log('No data in Firestore, checking localStorage...');
-                    // No data in Firestore, try localStorage migration
-                    const storageKey = `fireData_${currentUserId}_v1`;
-                    const savedData = localStorage.getItem(storageKey);
-                    if (savedData) {
-                        console.log('Found data in localStorage, migrating to Firestore...');
-                        let parsedData = JSON.parse(savedData);
-                        parsedData = parsedData.map(month => ({
-                            ...month,
-                            debtCollaboration: month.debtCollaboration || currentCategories.liabilities.reduce((acc, curr) => ({ ...acc, [curr]: 0 }), {})
-                        }));
-                        setData(parsedData);
-                        // Save to Firestore
-                        setDoc(userDocRef, { data: parsedData })
-                            .then(() => console.log('Data migrated to Firestore successfully'))
-                            .catch(error => console.error('Error migrating data to Firestore:', error));
-                    } else {
-                        console.log('No data found, creating initial data...');
-                        const initialData = generateInitialData();
-                        setData(initialData);
-                        // Save to Firestore
-                        setDoc(userDocRef, { data: initialData })
-                            .then(() => console.log('Initial data saved to Firestore successfully'))
-                            .catch(error => console.error('Error saving initial data to Firestore:', error));
-                    }
-                }
-            }, (error) => {
-                console.error('Error loading data from Firestore:', error);
-                console.log('Falling back to localStorage due to Firestore error');
-                // Fallback to localStorage
-                const storageKey = `fireData_${currentUserId}_v1`;
-                const savedData = localStorage.getItem(storageKey);
-                if (savedData) {
-                    let parsedData = JSON.parse(savedData);
-                    parsedData = parsedData.map(month => ({
-                        ...month,
-                        debtCollaboration: month.debtCollaboration || currentCategories.liabilities.reduce((acc, curr) => ({ ...acc, [curr]: 0 }), {})
-                    }));
-                    setData(parsedData);
-                    console.log('Loaded data from localStorage as fallback');
-                } else {
-                    console.log('No data in localStorage, creating initial dataset...');
+                    console.log('⚠️ No data in Firebase, creating initial data...');
                     const initialData = generateInitialData();
                     setData(initialData);
+                    // Save to Firebase
+                    setDoc(userDocRef, { data: initialData }, { merge: true })
+                        .then(() => console.log('☁️ Initial data saved to Firebase'))
+                        .catch(error => console.error('❌ Error saving initial data to Firebase:', error));
                 }
+                setIsLoading(false);
+            }, (error) => {
+                console.error('❌ Error loading from Firebase:', error);
+                console.log('⚠️ Firebase error - no data loaded');
+                setData(generateInitialData());
+                setIsLoading(false);
             });
 
             return () => unsubscribe();
+        } else {
+            console.log('⚠️ Firebase not available - no data loaded');
+            setData(generateInitialData());
+            setIsLoading(false);
         }
-    }, [currentUserId, isFirestoreAvailable]);
+    }, [currentUserId, isFirestoreAvailable, currentCategories]);
 
     // Migrate data when language changes
 
@@ -172,34 +126,45 @@ export const useFireData = (currentUserId) => {
         }
     }, [data, currentCategories.income, currentCategories.taxes, currentCategories.expenses]);
 
-    // Save data to Firestore on change
+    // Save data to Firebase only on change (with debouncing)
     useEffect(() => {
         if (data.length > 0 && currentUserId) {
-            console.log('Saving data to Firestore for user:', currentUserId);
-            console.log('Data to save:', data);
-            const userDocRef = getUserDocRef();
-            if (userDocRef) {
-                setDoc(userDocRef, { data })
-                    .then(() => console.log('Data saved successfully to Firestore'))
-                    .catch(error => {
-                        console.error('Error saving to Firestore:', error);
-                        console.log('Continuing with localStorage only');
-                    });
+            console.log('☁️ Scheduling Firebase save for user:', currentUserId);
+            
+            // Cancelar timeout anterior si existe
+            if (saveTimeoutRef.current) {
+                clearTimeout(saveTimeoutRef.current);
             }
+            
+            // Guardar referencia para el próximo save
+            pendingSaveRef.current = data;
+            
+            // Programar save con debounce (1 segundo)
+            saveTimeoutRef.current = setTimeout(() => {
+                if (pendingSaveRef.current && isFirestoreAvailable === true) {
+                    const userDocRef = getUserDocRef();
+                    if (userDocRef) {
+                        console.log('☁️ Executing debounced save to Firebase...');
+                        setDoc(userDocRef, { data: pendingSaveRef.current }, { merge: true })
+                            .then(() => console.log('☁️ Data saved to Firebase successfully'))
+                            .catch(error => {
+                                console.error('❌ Error saving to Firebase:', error);
+                                console.log('⚠️ Data not saved - Firebase unavailable');
+                            });
+                    }
+                }
+                saveTimeoutRef.current = null;
+                pendingSaveRef.current = null;
+            }, 1000); // 1 segundo de debounce
         }
-        // Also keep localStorage as backup and notify other tabs
-        if (data.length > 0) {
-            const storageKey = currentUserId ? `fireData_${currentUserId}_v1` : 'fireData_es_v1';
-            try {
-                localStorage.setItem(storageKey, JSON.stringify(data));
-                // Write a companion timestamp key to reliably notify other tabs of an update
-                localStorage.setItem(`${storageKey}_updatedAt`, String(Date.now()));
-                console.log('Data saved to localStorage:', storageKey);
-            } catch (err) {
-                console.error('Error saving to localStorage:', err);
+        
+        // Cleanup
+        return () => {
+            if (saveTimeoutRef.current) {
+                clearTimeout(saveTimeoutRef.current);
             }
-        }
-    }, [data, currentUserId, getUserDocRef]);
+        };
+    }, [data, currentUserId, isFirestoreAvailable, getUserDocRef]);
 
     // Sync across multiple open tabs/windows using the storage event.
     useEffect(() => {
@@ -248,7 +213,7 @@ export const useFireData = (currentUserId) => {
                 }
                 // Handle debtCollaboration table
                 else if (type === 'debtCollaboration') {
-                    // Ensure we have valid numbers
+                    // Ensure we have valid numbers - handle empty string as 0
                     const rawValue = value === '' ? 0 : Number(value);
                     const newValue = isNaN(rawValue) ? 0 : rawValue;
 
@@ -257,16 +222,17 @@ export const useFireData = (currentUserId) => {
                         [category]: newValue
                     };
                 }
-                // Handle regular asset/liability updates
+                // Handle regular updates (income, taxes, expenses, assets, liabilities)
                 else {
+                    // Handle empty string as 0, ensure valid number
+                    const rawValue = value === '' ? 0 : Number(value);
+                    const newValue = isNaN(rawValue) ? 0 : rawValue;
+                    
                     updatedItem[type] = {
                         ...item[type],
-                        [category]: Number(value)
+                        [category]: newValue
                     };
                 }
-
-                // No auto-calculation for Bank - it's independent
-                // Bank value is only updated when directly edited
 
                 console.log('updatedItem for month', monthId, updatedItem);
                 return updatedItem;
@@ -325,6 +291,7 @@ export const useFireData = (currentUserId) => {
         addPreviousMonth,
         removeLastMonth,
         loadData,
+        isLoading,
         isFirestoreAvailable,
         errorMessage
     };

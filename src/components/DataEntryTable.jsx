@@ -3,6 +3,7 @@ import { LineChart as LineChartIcon } from 'lucide-react';
 import { formatCurrency, generateMonthId } from '../utils';
 import { useMonthNavigation } from '../contexts/MonthNavigationContext';
 import { CategoryTrendModal } from './charts/CategoryTrendModal';
+import { OptimizedNumberInput } from './OptimizedNumberInput';
 
 export const DataEntryTable = ({
     type,
@@ -118,11 +119,10 @@ export const DataEntryTable = ({
                                     </div>
                                 </td>
                                 <td className="px-0 py-0">
-                                    <input
-                                        type="number"
-                                        value={selectedMonth?.[type]?.[cat] || ''}
+                                    <OptimizedNumberInput
+                                        value={selectedMonth?.[type]?.[cat]}
+                                        onChange={(value) => updateData(selectedMonth.id, type, cat, value)}
                                         placeholder="0"
-                                        onChange={(e) => updateData(selectedMonth.id, type, cat, e.target.value)}
                                         disabled={!canEdit}
                                         className={`w-full px-4 py-3 text-right border-none outline-none transition-colors ${canEdit
                                             ? 'bg-transparent focus:ring-2 focus:ring-inset focus:ring-blue-500 cursor-text'
