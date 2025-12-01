@@ -27,15 +27,18 @@ export const DebtTable = ({
         const totalDebt = Object.values(currentMonth?.liabilities || {}).reduce((a, b) => a + Number(b || 0), 0);
         const totalAssets = Object.values(currentMonth?.assets || {}).reduce((a, b) => a + Number(b || 0), 0);
 
-        const previousDebt = previousMonth
-            ? Object.values(previousMonth?.liabilities || {}).reduce((a, b) => a + Number(b || 0), 0)
-            : totalDebt;
+        let debtReduction = 0;
+        
+        if (previousMonth) {
+            const previousDebt = Object.values(previousMonth?.liabilities || {}).reduce((a, b) => a + Number(b || 0), 0);
+            debtReduction = previousDebt - totalDebt;
+        }
+        // If no previous month, debtReduction stays 0 (no comparison possible)
 
-        const debtReduction = previousDebt - totalDebt;
         const debtToAssetRatio = totalAssets > 0 ? (totalDebt / totalAssets) * 100 : 0;
 
         return { totalDebt, debtReduction, debtToAssetRatio };
-    }, [historicalData, selectedMonthIndex]);
+    }, [historicalData, selectedMonthIndex, JSON.stringify(historicalData?.[selectedMonthIndex]?.liabilities), JSON.stringify(historicalData?.[selectedMonthIndex - 1]?.liabilities)]);
 
     return (
         <div className="space-y-4">
@@ -63,6 +66,9 @@ export const DebtTable = ({
                         }`}>
                         {debtMetrics.debtReduction >= 0 ? '+' : ''}{formatCurrency(Math.abs(debtMetrics.debtReduction), 'en', exchangeRates)}
                     </p>
+                    {debtMetrics.debtReduction === 0 && historicalData.length <= 1 && (
+                        <p className="text-xs text-slate-500 mt-1">Add previous month to see changes</p>
+                    )}
                 </div>
 
                 <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3">

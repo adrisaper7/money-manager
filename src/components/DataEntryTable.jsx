@@ -139,9 +139,18 @@ export const DataEntryTable = ({
                                                 type="number"
                                                 value={secondaryValues[cat] ?? ''}
                                                 placeholder={secondaryColumn.placeholder || '0'}
+                                                max={selectedMonth?.[type]?.[cat] || 0}
                                                 onChange={(e) => {
                                                     if (!canEdit) return;
-                                                    handleSecondaryChange(cat, e.target.value);
+                                                    const maxValue = selectedMonth?.[type]?.[cat] || 0;
+                                                    let value = Number(e.target.value);
+                                                    
+                                                    // Limit to maximum debt value
+                                                    if (value > maxValue) {
+                                                        value = maxValue;
+                                                    }
+                                                    
+                                                    handleSecondaryChange(cat, value.toString());
                                                 }}
                                                 disabled={!canEdit}
                                                 className={`w-full px-4 py-3 text-right border-none outline-none transition-colors ${canEdit
