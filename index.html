@@ -2,17 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/money-manager/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gestor de Dinero</title>
   </head>
   <body>
     <div id="root"></div>
-    <!-- Redirect to the actual app at /money-manager/ -->
-    <script>
-      if (!window.location.pathname.includes('/money-manager/')) {
-        window.location.href = '/money-manager/';
-      }
-    </script>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
