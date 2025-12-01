@@ -145,15 +145,18 @@ export const calculatePercentageBasedInvestment = ({ data = [], investmentRate =
     };
 };
 
-export const calculateCategoryAverages = (data = [], type, categories = []) => {
+export const calculateCategoryAverages = (data = [], type, categories = [], monthsWindow = 6) => {
     if (!Array.isArray(data) || data.length === 0 || !type || !categories.length) {
         return {};
     }
 
+    // Use only the last specified number of months (default 6)
+    const recentData = data.slice(-monthsWindow);
+    
     const averages = {};
     
     categories.forEach(category => {
-        const values = data.map(month => Number(month?.[type]?.[category] || 0));
+        const values = recentData.map(month => Number(month?.[type]?.[category] || 0));
         const validValues = values.filter(val => val > 0);
         
         if (validValues.length > 0) {
