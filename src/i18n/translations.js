@@ -40,7 +40,12 @@ export const translations = {
       subtitle: 'Seguimiento de Activos y Deudas.',
       totalNetWorth: 'Patrimonio Total',
       assets: 'Activos',
-      liabilities: 'Deudas (Pasivos)'
+      liabilities: 'Deudas (Pasivos)',
+      netChange: 'Cambio Neto (mes actual - anterior)',
+      annualChange: 'Cambio Neto (últimos 12 meses)',
+      paid: 'Pagado',
+      assetEvolution: 'Evolución de Activos',
+      liabilityEvolution: 'Evolución de Pasivos'
     },
     investments: {
       title: 'Activos de Inversión',
@@ -83,7 +88,14 @@ export const translations = {
       removeLastMonth: 'Eliminar último mes',
       download: 'Descargar',
       upload: 'Cargar',
-      loading: 'Cargando...'
+      loading: 'Cargando...',
+      monthNavigation: 'Navegación de Meses',
+      lockEditing: 'Bloquear Edición',
+      enableEditing: 'Habilitar Edición',
+      removeMonth: 'Eliminar Mes',
+      currentMonth: 'Mes Actual',
+      editModeActive: 'Modo Edición Activo',
+      monthCount: 'Mes {{current}} de {{total}}'
     },
     configuration: {
       title: 'Configuración',
@@ -132,7 +144,12 @@ export const translations = {
       subtitle: 'Track your assets and liabilities.',
       totalNetWorth: 'Total Net Worth',
       assets: 'Assets',
-      liabilities: 'Liabilities'
+      liabilities: 'Liabilities',
+      netChange: 'Net Change (current - previous)',
+      annualChange: 'Net Change (last 12 months)',
+      paid: 'Paid',
+      assetEvolution: 'Asset Evolution',
+      liabilityEvolution: 'Liability Evolution'
     },
     investments: {
       title: 'Investment Assets',
@@ -175,7 +192,14 @@ export const translations = {
       removeLastMonth: 'Remove last month',
       download: 'Download',
       upload: 'Upload',
-      loading: 'Loading...'
+      loading: 'Loading...',
+      monthNavigation: 'Month Navigation',
+      lockEditing: 'Lock Editing',
+      enableEditing: 'Enable Editing',
+      removeMonth: 'Remove Month',
+      currentMonth: 'Current Month',
+      editModeActive: 'Edit Mode Active',
+      monthCount: 'Month {{current}} of {{total}}'
     },
     configuration: {
       title: 'Configuration',

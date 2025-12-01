@@ -75,14 +75,28 @@ export const useFireData = (currentUserId) => {
                                     'Seguridad Social': 'Social Security',
                                     'Cuota Autónomos': 'Self-Employment Tax',
                                     'Vivienda': 'Housing',
-                                    'Supermercado': 'Groceries',
-                                    'Restaurantes': 'Restaurants',
-                                    'Suministros': 'Utilities',
+                                    'Gas (Hogar)': 'Gas (Home)',
+                                    'Electricidad': 'Electric',
+                                    'Internet': 'Internet',
                                     'Seguros': 'Insurance',
-                                    'Transporte': 'Transportation',
-                                    'Ocio': 'Leisure',
-                                    'Salud': 'Health',
-                                    'Varios': 'Miscellaneous'
+                                    'Supermercado': 'Groceries',
+                                    'Comer fuera': 'Eating Out',
+                                    'Gasolina': 'Gas (Car)',
+                                    'Transporte compartido': 'Rideshare',
+                                    'Transporte público': 'Public Transit',
+                                    'Peajes': 'Tolls',
+                                    'Entretenimiento': 'Entertainment',
+                                    'Ropa': 'Clothing',
+                                    'Cuidado personal': 'Self Care',
+                                    'Tintorería': 'Dry Cleaning',
+                                    'Gimnasio': 'Gym',
+                                    'Música': 'Music',
+                                    'Educación': 'Education',
+                                    'Médico': 'Medical',
+                                    'Regalos': 'Gifts',
+                                    'Donaciones': 'Charity',
+                                    'Comisiones': 'Fees',
+                                    'Varios': 'Misc'
                                 }
                             },
                             en: {
@@ -106,19 +120,39 @@ export const useFireData = (currentUserId) => {
                                     'Social Security': 'Seguridad Social',
                                     'Self-Employment Tax': 'Cuota Autónomos',
                                     'Housing': 'Vivienda',
-                                    'Groceries': 'Supermercado',
-                                    'Restaurants': 'Restaurantes',
-                                    'Utilities': 'Suministros',
+                                    'Gas (Home)': 'Gas (Hogar)',
+                                    'Electric': 'Electricidad',
+                                    'Internet': 'Internet',
                                     'Insurance': 'Seguros',
-                                    'Transportation': 'Transporte',
-                                    'Leisure': 'Ocio',
-                                    'Health': 'Salud',
-                                    'Miscellaneous': 'Varios'
+                                    'Groceries': 'Supermercado',
+                                    'Eating Out': 'Comer fuera',
+                                    'Gas (Car)': 'Gasolina',
+                                    'Rideshare': 'Transporte compartido',
+                                    'Public Transit': 'Transporte público',
+                                    'Tolls': 'Peajes',
+                                    'Entertainment': 'Entretenimiento',
+                                    'Clothing': 'Ropa',
+                                    'Self Care': 'Cuidado personal',
+                                    'Dry Cleaning': 'Tintorería',
+                                    'Gym': 'Gimnasio',
+                                    'Music': 'Música',
+                                    'Education': 'Educación',
+                                    'Medical': 'Médico',
+                                    'Gifts': 'Regalos',
+                                    'Charity': 'Donaciones',
+                                    'Fees': 'Comisiones',
+                                    'Misc': 'Varios'
                                 }
                             }
                         };
 
-                        const mappedCategory = categoryMap[fromLang]?.[toLang]?.[newCategory] || newCategory;
+                        // We are iterating over Target categories (newCategory).
+                        // We need to find the Source category name to look up the value in the old data.
+                        // The map is defined as Source -> Target (e.g. es -> en).
+                        // So we need to look up: What is the Source category that maps to this Target category?
+                        // Since our map is bidirectional (contains both es->en and en->es), we can use the reverse map:
+                        // categoryMap[toLang][fromLang][newCategory] gives us the Source category.
+                        const mappedCategory = categoryMap[toLang]?.[fromLang]?.[newCategory] || newCategory;
                         migratedValues[newCategory] = month[type][mappedCategory] || 0;
                     }
                 });
@@ -149,7 +183,7 @@ export const useFireData = (currentUserId) => {
                         }
                     };
 
-                    const mappedCategory = categoryMap[fromLang]?.[toLang]?.[newCategory] || newCategory;
+                    const mappedCategory = categoryMap[toLang]?.[fromLang]?.[newCategory] || newCategory;
                     migratedDebtCollaboration[newCategory] = month.debtCollaboration[mappedCategory] || 0;
                 });
                 migratedMonth.debtCollaboration = migratedDebtCollaboration;

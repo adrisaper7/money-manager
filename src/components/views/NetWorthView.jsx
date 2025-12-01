@@ -69,13 +69,13 @@ const NetWorthContent = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth, u
                         <p className="text-2xl font-bold text-emerald-600">{formatCurrency(displayNetWorth, language, exchangeRates)}</p>
                     </div>
                     <div className="text-right border-l border-slate-300 pl-6">
-                        <p className="text-sm text-slate-500">Cambio Neto (mes actual - anterior)</p>
+                        <p className="text-sm text-slate-500">{t('networth.netChange')}</p>
                         <p className={`text-2xl font-bold ${isPositive ? 'text-emerald-600' : 'text-red-600'}`}>
                             {isPositive ? '+' : ''}{formatCurrency(netWorthChange, language, exchangeRates)}
                         </p>
                     </div>
                     <div className="text-right border-l border-slate-300 pl-6">
-                        <p className="text-sm text-slate-500">Cambio Neto (últimos 12 meses)</p>
+                        <p className="text-sm text-slate-500">{t('networth.annualChange')}</p>
                         <p className={`text-2xl font-bold ${annualNetWorthChange >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
                             {annualNetWorthChange >= 0 ? '+' : ''}{formatCurrency(annualNetWorthChange, language, exchangeRates)}
                         </p>
@@ -110,7 +110,7 @@ const NetWorthContent = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth, u
                     historicalData={data}
                     showTrendIcon
                     secondaryColumn={{
-                        header: 'Pagado',
+                        header: t('networth.paid'),
                         getValue: (month, category) => month?.debtCollaboration?.[category] || 0,
                         formatValue: (value) => formatCurrency(value, language, exchangeRates),
                         editable: true,
@@ -124,7 +124,7 @@ const NetWorthContent = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth, u
                     data={data}
                     type="assets"
                     categories={categories.assets}
-                    title={language === 'es' ? 'Evolución de Activos' : 'Asset Evolution'}
+                    title={t('networth.assetEvolution')}
                     language={language}
                     exchangeRates={exchangeRates}
                 />
@@ -132,7 +132,7 @@ const NetWorthContent = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth, u
                     data={data}
                     type="liabilities"
                     categories={categories.liabilities}
-                    title={language === 'es' ? 'Evolución de Pasivos' : 'Liability Evolution'}
+                    title={t('networth.liabilityEvolution')}
                     language={language}
                     exchangeRates={exchangeRates}
                 />
