@@ -50,7 +50,8 @@ export const useFireStats = (data, config) => {
                 assets,
                 liabilities,
                 debtCollaboration,
-                netWorth: assets + debtCollaboration - liabilities,
+                // Net worth = assets - (liabilities - paid) = assets - unpaid debt
+                netWorth: assets - (liabilities - debtCollaboration),
                 savings,
                 savingsRate,
             };
@@ -59,7 +60,8 @@ export const useFireStats = (data, config) => {
         const totalAssets = sumValues(current.assets);
         const totalLiabilities = sumValues(current.liabilities);
         const debtCollaborationTotal = sumValues(current.debtCollaboration);
-        const netWorth = totalAssets + debtCollaborationTotal - totalLiabilities;
+        // Net worth = assets - (liabilities - paid) = assets - unpaid debt
+        const netWorth = totalAssets - (totalLiabilities - debtCollaborationTotal);
 
         // Activos considerados como objetivos de inversión (filtrar por categorías)
         let investmentAssetsTotal = 0;

@@ -17,12 +17,14 @@ const ASSET_COLORS = {
     'Index Funds': '#10b981',
     'Pension Plans': '#3b82f6',
     'Real Estate': '#14b8a6',
+    'Home': '#0ea5e9',
+    'Auto': '#a855f7',
     'Crypto': '#ef4444'
 };
 
 export const NetWorthChart = ({ data, exchangeRates = {} }) => {
     const categories = getCategoriesForLanguage();
-    
+
     const chartData = data.map(row => {
         const result = { monthLabel: row.monthLabel };
         categories.assets.forEach(asset => {
@@ -30,7 +32,10 @@ export const NetWorthChart = ({ data, exchangeRates = {} }) => {
         });
         const totalAssets = categories.assets.reduce((sum, asset) => sum + Number(row.assets?.[asset] || 0), 0);
         const totalLiabilities = Object.values(row.liabilities || {}).reduce((a, b) => a + Number(b), 0);
-        result.netWorth = totalAssets - totalLiabilities;
+        const totalPaid = Object.values(row.debtCollaboration || {}).reduce((a, b) => a + Number(b), 0);
+
+        // Net worth = assets - (liabilities - paid) = assets - unpaid debt
+        result.netWorth = totalAssets - (totalLiabilities - totalPaid);
         return result;
     });
 

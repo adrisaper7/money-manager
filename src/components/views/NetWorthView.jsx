@@ -30,7 +30,11 @@ const NetWorthContent = ({ data, stats, onAddPreviousMonth, onRemoveLastMonth, u
         const assets = Object.values(month.assets || {}).reduce((a, b) => a + Number(b || 0), 0);
         const liabilities = Object.values(month.liabilities || {}).reduce((a, b) => a + Number(b || 0), 0);
         const debtCollab = Object.values(month.debtCollaboration || {}).reduce((a, b) => a + Number(b || 0), 0);
-        return assets + debtCollab - liabilities;
+
+        // Net worth = assets - unpaid debt
+        // For debts like mortgages/auto loans: asset value is tracked separately
+        // For debts like credit cards: borrowed money should be added to Bank/Cash assets
+        return assets - (liabilities - debtCollab);
     };
 
     const netWorthChange = useMemo(() => {

@@ -18,12 +18,12 @@ export const InvestmentView = ({ data, stats, onAddPreviousMonth, onRemoveLastMo
         const currentAssets = Object.values(currentMonth.assets || {}).reduce((a, b) => a + Number(b), 0);
         const currentLiabilities = Object.values(currentMonth.liabilities || {}).reduce((a, b) => a + Number(b), 0);
         const currentDebtCollab = Object.values(currentMonth.debtCollaboration || {}).reduce((a, b) => a + Number(b), 0);
-        const currentNetWorth = currentAssets + currentDebtCollab - currentLiabilities;
+        const currentNetWorth = currentAssets - (currentLiabilities - currentDebtCollab);
 
         const prevAssets = Object.values(previousMonth.assets || {}).reduce((a, b) => a + Number(b), 0);
         const prevLiabilities = Object.values(previousMonth.liabilities || {}).reduce((a, b) => a + Number(b), 0);
         const prevDebtCollab = Object.values(previousMonth.debtCollaboration || {}).reduce((a, b) => a + Number(b), 0);
-        const prevNetWorth = prevAssets + prevDebtCollab - prevLiabilities;
+        const prevNetWorth = prevAssets - (prevLiabilities - prevDebtCollab);
 
         return currentNetWorth - prevNetWorth;
     };
